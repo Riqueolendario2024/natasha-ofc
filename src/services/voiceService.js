@@ -1,4 +1,4 @@
-import { MsEdgeTTS, OUTPUT_FORMAT } from "edge-tts";
+import { EdgeTTS } from "node-edge-tts";
 
 export async function generatePodcastAudio(script) {
   try {
@@ -21,19 +21,9 @@ export async function generatePodcastAudio(script) {
 
       if (!textToSpeak) continue;
 
-      const tts = new MsEdgeTTS();
-      await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBPS_MONO_MP3);
-      
-      const stream = tts.toStream(textToSpeak);
-      const chunks = [];
-
-      await new Promise((resolve, reject) => {
-        stream.on("data", (chunk) => chunks.push(chunk));
-        stream.on("end", () => resolve());
-        stream.on("error", (err) => reject(err));
-      });
-
-      audioBuffers.push(Buffer.concat(chunks));
+      const tts = new EdgeTTS({ voice });
+      const buffer = await tts.synthesizeBuffer(textToSpeak);
+      audioBuffers.push(buffer);
     }
 
     return Buffer.concat(audioBuffers);
