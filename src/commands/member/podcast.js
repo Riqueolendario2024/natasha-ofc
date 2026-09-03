@@ -3,10 +3,10 @@ import { askAI } from "../../services/aiService.js";
 import { generatePodcastAudio } from "../../services/voiceService.js";
 
 export const name = "podcast";
-export const aliases = ["pod", "resumo"];
+export const commands = ["pod", "resumo"];
 export const description = "Gera um podcast em áudio com Alex e Sam comentando as conversas do grupo!";
 
-async function handleCommand({ message, reply }) {
+export async function handle({ message, reply }) {
   if (message.deferReply) {
     await message.deferReply();
   } else if (message.channel?.sendTyping) {
@@ -72,6 +72,4 @@ ${chatHistory}
   }
 }
 
-export const run = handleCommand;
-export const execute = handleCommand;
-export default { name, aliases, description, run: handleCommand, execute: handleCommand };
+export default { name, commands, description, handle };
