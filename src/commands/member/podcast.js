@@ -6,7 +6,7 @@ export const name = "podcast";
 export const aliases = ["pod", "resumo"];
 export const description = "Gera um podcast em áudio com Alex e Sam comentando as conversas do grupo!";
 
-export async function run({ message, reply }) {
+async function handleCommand({ message, reply }) {
   if (message.deferReply) {
     await message.deferReply();
   } else if (message.channel?.sendTyping) {
@@ -71,3 +71,7 @@ ${chatHistory}
     return await reply("Ocorreu um erro ao gerar o podcast.");
   }
 }
+
+export const run = handleCommand;
+export const execute = handleCommand;
+export default { name, aliases, description, run: handleCommand, execute: handleCommand };
