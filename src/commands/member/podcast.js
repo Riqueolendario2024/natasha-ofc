@@ -3,6 +3,7 @@ import { askAI } from "../../services/aiService.js";
 import { generatePodcastAudio } from "../../services/voiceService.js";
 
 export const name = "podcast";
+export const aliases = ["pod", "resumo"];
 export const description = "Gera um podcast em áudio com Alex e Sam comentando as conversas do grupo!";
 
 export async function run({ message, reply }) {
