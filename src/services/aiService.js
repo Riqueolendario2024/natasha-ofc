@@ -79,10 +79,10 @@ Diretrizes Obrigatórias:
 - Tom: Espontânea, inteligente, amigável e natural.
 - Respostas Curtas: 1 a 3 frases no máximo, direto ao ponto.
 - AÇÃO DIRETA: Se pedirem piada, história ou explicação, ENTREGUE O CONTEÚDO IMEDIATAMENTE no mesmo turno.
-- Se receber um áudio, transcreva/entenda o que foi dito e responda naturalmente.`.trim();
+- Se receber um áudio, transcreva/entenda o que foi dito e responda naturally.`.trim();
 
   if (aiClient) {
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-3.6-flash"];
 
     for (const modelName of modelsToTry) {
       try {
