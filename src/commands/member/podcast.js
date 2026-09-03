@@ -1,6 +1,5 @@
 import { AttachmentBuilder } from "discord.js";
-import { askAI } from "../../services/aiService.js";
-import { generatePodcastAudio } from "../../services/voiceService.js";
+import { askAI, generatePodcastAudio } from "../../services/aiService.js";
 
 export const name = "podcast";
 export const commands = ["pod", "resumo"];

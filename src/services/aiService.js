@@ -14,7 +14,7 @@ if (apiKey && apiKey !== "SUA_CHAVE_AQUI") {
   aiClient = new GoogleGenAI({ apiKey });
 }
 
-// Converte Ogg/Opus do Discord para WAV via ffmpeg (formato mais estável e universal para IA)
+// Converte Ogg/Opus do Discord para WAV via ffmpeg
 function convertToWav(inputBuffer) {
   return new Promise((resolve) => {
     const ffmpeg = spawn("ffmpeg", [
@@ -75,8 +75,8 @@ Horário de Brasília: ${agoraBrasil}.
 Diretrizes Obrigatórias:
 - Tom: Espontânea, inteligente, amigável e natural.
 - Respostas Curtas: 1 a 3 frases no máximo, direto ao ponto.
-- AÇÃO DIRETA: Se pedirem piada, história ou explicação, ENTREGUE O CONTEÚDO IMEDIATAMENTE no mesmo turno. Jamais diga que vai procurar sem contar a piada.
-- Se receber um áudio, transcreva/entenda o que foi dito e responda naturalmente.
+- AÇÃO DIRETA: Se pedirem piada, história ou explicação, ENTREGUE O CONTEÚDO IMEDIATAMENTE no mesmo turno.
+- Se receber um áudio, transcreva/entenda o que foi dito e responda naturally.
 `.trim();
 
   if (aiClient) {
@@ -117,17 +117,38 @@ Diretrizes Obrigatórias:
     }
   }
 
-  // Fallback inteligente caso a API falhe
-  if (prompt.toLowerCase().includes("piada")) {
-    const piadas = [
-      "Por que o livro de matemática se suicidou? Porque tinha muitos problemas! 😂",
-      "Qual é o café favorito do desenvolvedor? O Java! ☕",
-      "O que o pato falou para a pata? Vem Quá! 🦆"
-    ];
-    return piadas[Math.floor(Math.random() * piadas.length)];
-  }
-
   return isOwner
-    ? "Fala chefe! Deu uma oscilada rápida na resposta, manda de novo aí!"
+    ? "Fala chefe! Deu uma oscilada rápida na API, manda a mensagem de novo!"
     : "Tive uma oscilação de conexão rápida. Pode repetir?";
+}
+
+// Geração de Áudio com Multi-Speaker TTS nativo do Gemini
+export async function generatePodcastAudio(script) {
+  if (!aiClient) return null;
+
+  try {
+    const response = await aiClient.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: script,
+      config: {
+        responseMimeType: "audio/mp3",
+        speechConfig: {
+          multiSpeakerConfig: {
+            speakers: ["Puck", "Charon"] // Alex e Sam com vozes distintas
+          }
+        }
+      }
+    });
+
+    const candidate = response.candidates?.[0];
+    const part = candidate?.content?.parts?.[0];
+
+    if (part?.inlineData?.data) {
+      return Buffer.from(part.inlineData.data, "base64");
+    }
+    return null;
+  } catch (err) {
+    console.error("[ERRO GEMINI MULTI-SPEAKER TTS]:", err?.message || err);
+    return null;
+  }
 }
