@@ -76,7 +76,7 @@ Diretrizes Obrigatórias:
 - Tom: Espontânea, inteligente, amigável e natural.
 - Respostas Curtas: 1 a 3 frases no máximo, direto ao ponto.
 - AÇÃO DIRETA: Se pedirem piada, história ou explicação, ENTREGUE O CONTEÚDO IMEDIATAMENTE no mesmo turno.
-- Se receber um áudio, transcreva/entenda o que foi dito e responda naturally.
+- Se receber um áudio, transcreva/entenda o que foi dito e responda naturalmente.
 `.trim();
 
   if (aiClient) {
@@ -122,29 +122,35 @@ Diretrizes Obrigatórias:
     : "Tive uma oscilação de conexão rápida. Pode repetir?";
 }
 
-// Geração de Áudio com Multi-Speaker TTS nativo do Gemini
+// Geração de Áudio com Multi-Speaker TTS nativo do Gemini 2.5
 export async function generatePodcastAudio(script) {
   if (!aiClient) return null;
 
   try {
+    const promptFormatado = `Leia o roteiro a seguir como um podcast falado por duas pessoas com vozes diferentes (Alex e Sam):\n\n${script}`;
+
     const response = await aiClient.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: script,
+      contents: promptFormatado,
       config: {
-        responseMimeType: "audio/mp3",
+        responseModalities: ["AUDIO"],
         speechConfig: {
-          multiSpeakerConfig: {
-            speakers: ["Puck", "Charon"] // Alex e Sam com vozes distintas
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: "Puck"
+            }
           }
         }
       }
     });
 
-    const candidate = response.candidates?.[0];
-    const part = candidate?.content?.parts?.[0];
-
-    if (part?.inlineData?.data) {
-      return Buffer.from(part.inlineData.data, "base64");
+    const candidates = response.candidates;
+    if (candidates && candidates[0]?.content?.parts) {
+      for (const part of candidates[0].content.parts) {
+        if (part.inlineData && part.inlineData.data) {
+          return Buffer.from(part.inlineData.data, "base64");
+        }
+      }
     }
     return null;
   } catch (err) {
