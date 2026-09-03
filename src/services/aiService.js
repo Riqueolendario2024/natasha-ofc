@@ -67,7 +67,6 @@ export async function askAI({ prompt, userId = "default", attachment = null }) {
   const agoraBrasil = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
   const isOwner = OWNER_IDS.includes(userId);
 
-  // Trata solicitação de podcast de forma isolada para não conflitar com instrução de respostas curtas
   const isPodcastRequest = prompt.toLowerCase().includes("podcast") || prompt.toLowerCase().includes("roteiro");
 
   const SYSTEM_INSTRUCTION = isPodcastRequest
@@ -129,7 +128,7 @@ Diretrizes Obrigatórias:
     : "Tive uma oscilação de conexão rápida. Pode repetir?";
 }
 
-// Geração de Áudio nativa com Gemini 2.5 Flash Multispeaker via REST API
+// Geração de Áudio nativa com Gemini 2.5 Flash via REST API
 export async function generatePodcastAudio(script) {
   if (!apiKey) return null;
 
@@ -142,7 +141,7 @@ export async function generatePodcastAudio(script) {
           role: "user",
           parts: [
             {
-              text: `Leia o seguinte roteiro com duas vozes distintas no formato de podcast:\n\n${script}`
+              text: `Leia o seguinte roteiro no formato de podcast com entonação natural de apresentação de áudio:\n\n${script}`
             }
           ]
         }
@@ -150,11 +149,10 @@ export async function generatePodcastAudio(script) {
       generationConfig: {
         responseModalities: ["AUDIO"],
         speechConfig: {
-          multiSpeakerConfig: {
-            speakers: [
-              { name: "Alex", voiceName: "Puck" },
-              { name: "Sam", voiceName: "Charon" }
-            ]
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: "Puck"
+            }
           }
         }
       }
@@ -175,7 +173,7 @@ export async function generatePodcastAudio(script) {
 
     return null;
   } catch (err) {
-    console.error("[ERRO GEMINI MULTISPEAKER REST]:", err?.response?.data || err?.message || err);
+    console.error("[ERRO GEMINI REST AUDIO]:", err?.response?.data || err?.message || err);
     return null;
   }
 }
