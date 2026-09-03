@@ -1,5 +1,15 @@
 import { EdgeTTS } from "node-edge-tts";
 
+export async function textToAudioBuffer(text, voice = "pt-BR-FranciscaNeural") {
+  try {
+    const tts = new EdgeTTS({ voice });
+    return await tts.synthesizeBuffer(text);
+  } catch (error) {
+    console.error("Erro no textToAudioBuffer:", error);
+    return null;
+  }
+}
+
 export async function generatePodcastAudio(script) {
   try {
     const lines = script.split("\n").filter((line) => line.trim().length > 0);
@@ -28,7 +38,7 @@ export async function generatePodcastAudio(script) {
 
     return Buffer.concat(audioBuffers);
   } catch (error) {
-    console.error("Erro ao gerar áudio de podcast com Edge-TTS:", error);
+    console.error("Erro no generatePodcastAudio:", error);
     return null;
   }
 }
