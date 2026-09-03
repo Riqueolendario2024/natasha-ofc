@@ -7,10 +7,10 @@ dotenv.config();
 
 const userConversations = new Map();
 
-const apiKey = process.env.GEMINI_API_KEY || "";
+const apiKey = process.env.GEMINI_API_KEY || "AIzaSyA343Aj6eO4LSpCKCq2JS4c-JlIr_nu9Hg";
 let aiClient = null;
 
-if (apiKey && apiKey !== "SUA_CHAVE_AQUI") {
+if (apiKey) {
   aiClient = new GoogleGenAI({ apiKey });
 }
 
@@ -22,6 +22,33 @@ function convertToWav(inputBuffer) {
       "-f", "wav",
       "-ac", "1",
       "-ar", "16000",
+      "pipe:1"
+    ]);
+
+    const chunks = [];
+    ffmpeg.stdout.on("data", (chunk) => chunks.push(chunk));
+    ffmpeg.on("close", (code) => {
+      if (code === 0 && chunks.length > 0) resolve(Buffer.concat(chunks));
+      else resolve(inputBuffer);
+    });
+    ffmpeg.on("error", () => resolve(inputBuffer));
+
+    ffmpeg.stdin.write(inputBuffer);
+    ffmpeg.stdin.end();
+  });
+}
+
+// Converte PCM bruto recebido do Gemini TTS para áudio MP3 válido
+function convertToMp3(inputBuffer) {
+  return new Promise((resolve) => {
+    const ffmpeg = spawn("ffmpeg", [
+      "-f", "s16le",
+      "-ar", "24000",
+      "-ac", "1",
+      "-i", "pipe:0",
+      "-codec:a", "libmp3lame",
+      "-b:a", "128k",
+      "-f", "mp3",
       "pipe:1"
     ]);
 
@@ -79,7 +106,7 @@ Diretrizes Obrigatórias:
 - Tom: Espontânea, inteligente, amigável e natural.
 - Respostas Curtas: 1 a 3 frases no máximo, direto ao ponto.
 - AÇÃO DIRETA: Se pedirem piada, história ou explicação, ENTREGUE O CONTEÚDO IMEDIATAMENTE no mesmo turno.
-- Se receber um áudio, transcreva/entenda o que foi dito e responda naturally.`.trim();
+- Se receber um áudio, transcreva/entenda o que foi dito e responda naturalmente.`.trim();
 
   if (aiClient) {
     const modelsToTry = ["gemini-2.5-flash", "gemini-3.6-flash"];
@@ -166,7 +193,8 @@ export async function generatePodcastAudio(script) {
     if (candidates && candidates[0]?.content?.parts) {
       for (const part of candidates[0].content.parts) {
         if (part.inlineData && part.inlineData.data) {
-          return Buffer.from(part.inlineData.data, "base64");
+          const rawPcmBuffer = Buffer.from(part.inlineData.data, "base64");
+          return await convertToMp3(rawPcmBuffer);
         }
       }
     }
