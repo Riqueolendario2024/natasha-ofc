@@ -1,0 +1,30 @@
+{
+  "forca": [
+    { "palavra": "GODOT", "dica": "Engine de jogos open source brasileira em ascensão" },
+    { "palavra": "FLAMENGO", "dica": "Maior torcida do Brasil" },
+    { "palavra": "JAVASCRIPT", "dica": "Linguagem em que a Natasha foi programada" },
+    { "palavra": "UBUNTU", "dica": "Sistema operacional Linux do desenvolvedor" },
+    { "palavra": "DISCORD", "dica": "Plataforma onde estamos conversando agora" },
+    { "palavra": "RIQUEFLA", "dica": "O lendário criador da Natasha" }
+  ],
+  "quiz": [
+    {
+      "categoria": "tecnologia",
+      "pergunta": "Qual linguagem foi desenvolvida na PUC-Rio e é muito usada em jogos?",
+      "opcoes": { "a": "Python", "b": "Lua", "c": "C#", "d": "Ruby" },
+      "correta": "b"
+    },
+    {
+      "categoria": "tecnologia",
+      "pergunta": "Quem é o criador da Natasha?",
+      "opcoes": { "a": "Bill Gates", "b": "Lendário Riquefla", "c": "Elon Musk", "d": "Zuckerberg" },
+      "correta": "b"
+    },
+    {
+      "categoria": "jogos",
+      "pergunta": "Qual nó principal é usado para movimentar personagens 2D na Godot 4?",
+      "opcoes": { "a": "Node2D", "b": "Area2D", "c": "CharacterBody2D", "d": "RigidBody2D" },
+      "correta": "c"
+    }
+  ]
+}

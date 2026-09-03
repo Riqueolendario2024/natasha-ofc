@@ -1,0 +1,132 @@
+{
+  "fazenda": {
+    "1": {
+      "titulo": "CRIANDO JOGO DE FAZENDA | NA GODOT #01",
+      "url": "https://www.youtube.com/watch?v=F4OEO5pikEc"
+    },
+    "2": {
+      "titulo": "PERSONAGEM | JOGO DE FAZENDA NA GODOT #02",
+      "url": "https://www.youtube.com/watch?v=SlZM28xobks"
+    },
+    "3": {
+      "titulo": "ANIMANDO E MOVIMENTANDO | JOGO DE FAZENDA NA GODOT #03",
+      "url": "https://www.youtube.com/watch?v=pWKWDHhd8SY"
+    },
+    "4": {
+      "titulo": "COLISÕES | JOGO DE FAZENDA NA GODOT #04",
+      "url": "https://www.youtube.com/watch?v=bEfDQXIBlVE"
+    },
+    "5": {
+      "titulo": "SINAIS E GRUPOS | JOGO DE FAZENDA NA GODOT #05",
+      "url": "https://www.youtube.com/watch?v=YKqO3BCMBWg"
+    },
+    "6": {
+      "titulo": "VARIÁVEIS GLOBAIS | JOGO DE FAZENDA NA GODOT #06",
+      "url": "https://www.youtube.com/watch?v=ppGzMAsvPqk"
+    },
+    "7": {
+      "titulo": "INSTÂNCIAS E INTERAÇÕES | JOGO DE FAZENDA NA GODOT #07",
+      "url": "https://www.youtube.com/watch?v=ba_9t8MWdck"
+    },
+    "8": {
+      "titulo": "PLANTAÇÃO E CONDIÇÃO | JOGO DE FAZENDA NA GODOT #08",
+      "url": "https://www.youtube.com/watch?v=vyPRaDcsO8k"
+    },
+    "9": {
+      "titulo": "SISTEMA DE COLHEITA | JOGO DE FAZENDA NA GODOT #09",
+      "url": "https://www.youtube.com/watch?v=nqLlQxvlxuo"
+    },
+    "10": {
+      "titulo": "INVENTÁRIO SIMPLES | JOGO DE FAZENDA NA GODOT #10",
+      "url": "https://www.youtube.com/watch?v=dQbHcC75PT4"
+    },
+    "11": {
+      "titulo": "MUDANDO OQUE IRÁ PLANTAR | JOGO DE FAZENDA NA GODOT #11",
+      "url": "https://www.youtube.com/watch?v=lWEXOfpTNfU"
+    },
+    "12": {
+      "titulo": "FONTE E CIRCUNSTÂNCIAS | JOGO DE FAZENDA NA GODOT #12",
+      "url": "https://www.youtube.com/watch?v=duvUllw53YE"
+    },
+    "13": {
+      "titulo": "DIÁLOGOS E FALAS | JOGO DE FAZENDA NA GODOT #13",
+      "url": "https://www.youtube.com/watch?v=DJ3X3-plfno"
+    },
+    "14": {
+      "titulo": "ENTRANDO NA CASA | JOGO DE FAZENDA NA GODOT #14",
+      "url": "https://www.youtube.com/watch?v=B4bbLT02Il4"
+    },
+    "15": {
+      "titulo": "ABRINDO PORTA E BAU | JOGO DE FAZENDA NA GODOT #15",
+      "url": "https://www.youtube.com/watch?v=FOUyAC_h4WQ"
+    },
+    "16": {
+      "titulo": "CRIAÇÃO DE ANIMAIS | JOGO DE FAZENDA NA GODOT #16",
+      "url": "https://www.youtube.com/watch?v=r54p4PiNCjw"
+    },
+    "17": {
+      "titulo": "INVENTÁRIO QUE SE ORGANIZA | JOGO DE FAZENDA NA GODOT #17",
+      "url": "https://www.youtube.com/watch?v=VOuexK-K2EI"
+    },
+    "18": {
+      "titulo": "MENSAGEM NA TELA | JOGO DE FAZENDA NA GODOT #18",
+      "url": "https://www.youtube.com/watch?v=JZBrc4_9lWk"
+    },
+    "19": {
+      "titulo": "OPERADORES LÓGICOS | JOGO DE FAZENDA NA GODOT #19",
+      "url": "https://www.youtube.com/watch?v=3nRWlhqDxJc"
+    },
+    "20": {
+      "titulo": "SISTEMA DE MERCADO | JOGO DE FAZENDA NA GODOT #20",
+      "url": "https://www.youtube.com/watch?v=bSLd9D3VLs8"
+    },
+    "21": {
+      "titulo": "TERMINANDO A LOJA | JOGO DE FAZENDA NA GODOT #21",
+      "url": "https://www.youtube.com/watch?v=LHd251Qw8yo"
+    },
+    "22": {
+      "titulo": "SISTEMA DIA E NOITE | JOGO DE FAZENDA NA GODOT #22",
+      "url": "https://www.youtube.com/watch?v=kSODHHbUcOE"
+    },
+    "23": {
+      "titulo": "CRIANDO CHUVA OU NEVE | JOGO DE FAZENDA NA GODOT #23",
+      "url": "https://www.youtube.com/watch?v=YEfPAP4K1VM"
+    },
+    "24": {
+      "titulo": "MÚSICAS E SONS | JOGO DE FAZENDA NA GODOT #24",
+      "url": "https://www.youtube.com/watch?v=x4Cg6f1TyIQ"
+    },
+    "25": {
+      "titulo": "RELÓGIO COM TEMPO REAL | JOGO DE FAZENDA NA GODOT #25",
+      "url": "https://www.youtube.com/watch?v=O7ERWpIYb1s"
+    },
+    "26": {
+      "titulo": "COMO PASSAR POR TRÁS DE OBJETOS | JOGO DE FAZENDA NA GODOT #26",
+      "url": "https://www.youtube.com/watch?v=G9xPJgBqQ7M"
+    },
+    "27": {
+      "titulo": "SISTEMA DE CULTIVO | JOGO DE FAZENDA NA GODOT #27",
+      "url": "https://www.youtube.com/watch?v=z9Hv5E0Br8U"
+    },
+    "28": {
+      "titulo": "EXPLICANDO @export @onready | JOGO DE FAZENDA NA GODOT #28",
+      "url": "https://www.youtube.com/watch?v=A-YHFg1iAt4"
+    },
+    "29": {
+      "titulo": "CRIANDO MENU INICIAL | JOGO DE FAZENDA NA GODOT #29",
+      "url": "https://www.youtube.com/watch?v=8W-KhiDGBVY"
+    },
+    "30": {
+      "titulo": "SALVE E LOAD | JOGO DE FAZENDA NA GODOT #30",
+      "url": "https://www.youtube.com/watch?v=MtsHkCZpFtI"
+    },
+    "31": {
+      "titulo": "LOAD GAME | JOGO DE FAZENDA NA GODOT #31",
+      "url": "https://www.youtube.com/watch?v=Py60OmD8vdE"
+    },
+    "32": {
+      "titulo": "EFEITO TV DE TUBO ! SHADERS NA GODOT | JOGO DE FAZENDA NA GODOT #32",
+      "url": "https://www.youtube.com/watch?v=g880ACB-Nqs"
+    }
+  }
+}

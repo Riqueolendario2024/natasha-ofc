@@ -1,0 +1,34 @@
+{
+  "players": {
+    "1525876900709404695": {
+      "name": "riquefla34_50679",
+      "level": 2,
+      "exp": 5,
+      "maxExp": 150,
+      "hp": 120,
+      "maxHp": 120,
+      "energy": 60,
+      "maxEnergy": 60,
+      "potions": 3,
+      "wins": 0,
+      "losses": 0,
+      "equippedWeapon": "Espada de Madeira (+5)",
+      "weaponBonus": 8
+    },
+    "1354425523316588565": {
+      "name": "riqueolendario2025_79590",
+      "level": 4,
+      "exp": 92,
+      "maxExp": 337,
+      "hp": 160,
+      "maxHp": 160,
+      "energy": 80,
+      "maxEnergy": 80,
+      "potions": 3,
+      "wins": 0,
+      "losses": 0,
+      "equippedWeapon": "Espada de Madeira (+5)",
+      "weaponBonus": 14
+    }
+  }
+}

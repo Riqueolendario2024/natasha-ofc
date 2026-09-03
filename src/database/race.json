@@ -1,0 +1,25 @@
+{
+  "pilots": {
+    "1354425523316588565": {
+      "name": "riqueolendario2025_79590",
+      "races": 3,
+      "wins": 2,
+      "streak": 0,
+      "bestStreak": 2
+    },
+    "1477124203051483279": {
+      "name": "inacio_pg",
+      "races": 1,
+      "wins": 0,
+      "streak": 0,
+      "bestStreak": 0
+    },
+    "1525876900709404695": {
+      "name": "riquefla34_50679",
+      "races": 1,
+      "wins": 1,
+      "streak": 1,
+      "bestStreak": 1
+    }
+  }
+}

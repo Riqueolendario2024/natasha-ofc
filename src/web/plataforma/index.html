@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pirate Adventure - Natasha Arcade</title>
+  <style>
+    @font-face {
+      font-family: 'ArcadeFont';
+      src: url('/galaxy/assets/fonte/upheaval/upheavtt.ttf') format('truetype');
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: 'ArcadeFont', monospace;
+      color: #fff;
+    }
+    #gameWrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    #menuScreen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      gap: 10px;
+      background: radial-gradient(circle at center, rgba(16, 24, 39, 0.65) 0%, rgba(3, 7, 18, 0.88) 100%);
+      backdrop-filter: blur(4px);
+      overflow-y: auto;
+      padding: 16px;
+    }
+    #menuScreen .menu-wood-btn { height: 46px; font-size: clamp(16px, 3.4vw, 24px); }
+    #menuScreen .game-logo-box { margin-bottom: 4px; }
+    .game-logo-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 12px;
+      animation: floatLogo 3s ease-in-out infinite;
+    }
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .game-title {
+      font-size: clamp(38px, 8vw, 68px);
+      color: #ffd700;
+      text-shadow: 4px 4px 0 #b33900, 6px 6px 0 #3a1500, 0 0 30px rgba(255, 180, 0, 0.8);
+      letter-spacing: 4px;
+      text-align: center;
+    }
+    .game-subtitle {
+      font-size: clamp(14px, 2.5vw, 20px);
+      color: #38bdf8;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 0 #0369a1;
+      margin-top: -6px;
+    }
+    .menu-wood-btn {
+      width: clamp(240px, 48vw, 340px);
+      height: 56px;
+      background: linear-gradient(180deg, #dfa364 0%, #b87836 100%);
+      border: 4px solid #4a240c;
+      box-shadow: inset 3px 3px 0 #ffd19c, inset -3px -3px 0 #7a4115, 0 8px 0 #2e1505, 0 12px 16px rgba(0,0,0,0.6);
+      color: #311502;
+      font-size: clamp(20px, 4vw, 28px);
+      font-family: inherit;
+      font-weight: bold;
+      letter-spacing: 2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s ease;
+      text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+    }
+    .menu-wood-btn:hover {
+      background: linear-gradient(180deg, #ecb479 0%, #ca853f 100%);
+      transform: translateY(-2px);
+      box-shadow: inset 3px 3px 0 #ffe0ba, inset -3px -3px 0 #7a4115, 0 10px 0 #2e1505;
+    }
+    .menu-wood-btn:active {
+      transform: translateY(6px);
+      box-shadow: inset 3px 3px 0 #7a4115, inset -3px -3px 0 #ffd19c, 0 2px 0 #2e1505;
+    }
+
+    #touchControls {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 24px;
+    }
+    #touchControls.hidden { display: none; }
+    .touch-btn {
+      pointer-events: auto;
+      width: 66px;
+      height: 66px;
+      background: rgba(0, 242, 254, 0.25);
+      border: 3px solid #00f2fe;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 26px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      backdrop-filter: blur(4px);
+    }
+    .touch-btn:active { background: #00f2fe; color: #000; transform: scale(0.92); }
+    .d-pad-touch { display: flex; gap: 16px; }
+
+    #pauseBtn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 15;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 3px solid #ffd700;
+      background: rgba(0,0,0,0.5);
+      color: #ffd700;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #pauseBtn.hidden { display: none; }
+
+    #muteBtn {
+      position: absolute;
+      top: 16px;
+      right: 68px;
+      z-index: 15;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 3px solid #38bdf8;
+      background: rgba(0,0,0,0.5);
+      color: #38bdf8;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #muteBtn.hidden { display: none; }
+
+    .screen-modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(4, 6, 12, 0.92);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+      text-align: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .screen-modal.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="gameWrapper">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="menuScreen">
+      <div class="game-logo-box">
+        <div class="game-title">AVENTURA DO PIRATA 🏴‍☠️</div>
+        <div class="game-subtitle">EDIÇÃO BRASILEIRA</div>
+      </div>
+      <button class="menu-wood-btn" id="btnPlay">JOGAR</button>
+      <button class="menu-wood-btn" id="btnLevels">FASES</button>
+      <button class="menu-wood-btn" id="btnStory">HISTÓRIA</button>
+      <button class="menu-wood-btn" id="btnCredits">CRÉDITOS</button>
+      <button class="menu-wood-btn" id="btnOptions">OPÇÕES</button>
+    </div>
+
+    <button id="pauseBtn" class="hidden">⏸</button>
+    <button id="muteBtn" class="hidden">🔊</button>
+
+    <div id="touchControls" class="hidden">
+      <div class="d-pad-touch">
+        <button class="touch-btn" id="btnLeft">◀</button>
+        <button class="touch-btn" id="btnRight">▶</button>
+      </div>
+      <button class="touch-btn" style="width: 76px; height: 76px; background: rgba(255,0,85,0.35); border-color: #ff0055;" id="btnJump">▲</button>
+    </div>
+
+    <div class="screen-modal hidden" id="pauseModal">
+      <div style="font-size: 38px; color: #38bdf8; margin-bottom: 20px;">PAUSADO ⏸</div>
+      <button class="menu-wood-btn" id="resumeBtn">CONTINUAR</button>
+    </div>
+
+    <div class="screen-modal hidden" id="gameOverModal">
+      <div style="font-size: 42px; color: #ff0055; text-shadow: 3px 3px 0 #660022; margin-bottom: 6px;">FIM DE JOGO 💥</div>
+      <p id="gameOverLineTxt" style="font-size: 16px; color: #f5d0c5; margin-bottom: 4px; max-width: 420px;"></p>
+      <p id="gameOverLevelTxt" style="font-size: 13px; color: #94a3b8; margin-bottom: 14px;"></p>
+      <p id="rewardTxt" style="color: #00ff66; font-size: 20px; margin-bottom: 24px;">🪙 +0 NatashaCoins creditadas!</p>
+      <button class="menu-wood-btn" id="restartBtn">TENTAR DE NOVO</button>
+      <button class="menu-wood-btn" id="gameOverMenuBtn" style="margin-top: 12px; width: 200px; height: 44px; font-size: 15px;">VOLTAR AO MENU</button>
+    </div>
+
+    <div class="screen-modal hidden" id="levelCompleteModal">
+      <div id="levelCompleteTitleTxt" style="font-size: 36px; color: #00ff66; text-shadow: 3px 3px 0 #064e3b; margin-bottom: 12px;">FASE CONCLUÍDA! 🏆</div>
+      <p id="levelCompleteBonusTxt" style="color: #ffd700; font-size: 18px; margin-bottom: 24px;"></p>
+      <button class="menu-wood-btn" id="btnNextLevel">PRÓXIMA FASE ▶</button>
+    </div>
+
+    <div class="screen-modal hidden" id="victoryModal">
+      <div style="font-size: 32px; color: #ffd700; text-shadow: 3px 3px 0 #7a4b00; margin-bottom: 12px;">🏆 VOCÊ ACHOU A CAVEIRA DOURADA! 🏆</div>
+      <p style="font-size: 15px; color: #f5d0c5; max-width: 420px; margin-bottom: 12px;">Parabéns, capitão! Você varreu as quatro ilhas e virou lenda entre os piratas do Discord.</p>
+      <p id="victoryCoinsTxt" style="color: #00ff66; font-size: 20px; margin-bottom: 24px;"></p>
+      <button class="menu-wood-btn" id="btnVictoryMenu">VOLTAR AO MENU</button>
+    </div>
+
+    <div class="screen-modal hidden" id="levelSelectScreen">
+      <div class="game-title" style="font-size: clamp(26px, 5vw, 36px); margin-bottom: 8px;">SELECIONE A FASE</div>
+      <div id="levelButtonsRow" style="display: flex; gap: 14px; margin: 20px 0; flex-wrap: wrap; justify-content: center; max-width: 700px;"></div>
+      <button class="menu-wood-btn" id="btnBackFromLevels" style="width: 200px; height: 44px; font-size: 15px;">VOLTAR</button>
+    </div>
+
+    <div class="screen-modal hidden" id="creditsModal">
+      <div class="game-title" style="font-size: clamp(24px, 5vw, 32px); margin-bottom: 12px;">CRÉDITOS</div>
+      <p style="font-size: 15px; margin-bottom: 4px;">🏴‍☠️ Aventura do Pirata — Edição Brasileira</p>
+      <p style="font-size: 20px; color: #ffd700; margin: 14px 0;">Criado por: <b>RiqueFla</b></p>
+      <p style="font-size: 12px; opacity: 0.75; max-width: 380px; margin-bottom: 4px;">Sprites baseados no pacote gratuito "Pirate Adventure" de Pixel Frog</p>
+      <p style="font-size: 12px; opacity: 0.75; margin-bottom: 24px;">Motor do jogo: Natasha Arcade Engine</p>
+      <button class="menu-wood-btn" id="btnCloseCredits" style="width: 200px; height: 44px; font-size: 15px;">VOLTAR</button>
+    </div>
+
+    <div class="screen-modal hidden" id="cutsceneScreen">
+      <div id="cutsceneArt" style="font-size: 64px; margin-bottom: 16px;">🏴‍☠️</div>
+      <p id="cutsceneText" style="max-width: 480px; font-size: 16px; line-height: 1.7; margin-bottom: 24px; min-height: 90px;"></p>
+      <div style="display: flex; gap: 12px;">
+        <button class="menu-wood-btn" id="btnCutsceneSkip" style="width: 150px; height: 44px; font-size: 15px;">PULAR</button>
+        <button class="menu-wood-btn" id="btnCutsceneNext" style="width: 170px; height: 44px; font-size: 15px;">AVANÇAR ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const V_WIDTH = 640;
+    const V_HEIGHT = 360;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      ctx.imageSmoothingEnabled = false;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const menuScreen = document.getElementById('menuScreen');
+    const touchControls = document.getElementById('touchControls');
+    const gameOverModal = document.getElementById('gameOverModal');
+    const pauseModal = document.getElementById('pauseModal');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    const btnPlay = document.getElementById('btnPlay');
+    const restartBtn = document.getElementById('restartBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    const rewardTxt = document.getElementById('rewardTxt');
+    const gameOverLineTxt = document.getElementById('gameOverLineTxt');
+    const gameOverLevelTxt = document.getElementById('gameOverLevelTxt');
+    const gameOverMenuBtn = document.getElementById('gameOverMenuBtn');
+    const levelCompleteModal = document.getElementById('levelCompleteModal');
+    const levelCompleteTitleTxt = document.getElementById('levelCompleteTitleTxt');
+    const levelCompleteBonusTxt = document.getElementById('levelCompleteBonusTxt');
+    const btnNextLevel = document.getElementById('btnNextLevel');
+    const victoryModal = document.getElementById('victoryModal');
+    const victoryCoinsTxt = document.getElementById('victoryCoinsTxt');
+    const btnVictoryMenu = document.getElementById('btnVictoryMenu');
+    const levelSelectScreen = document.getElementById('levelSelectScreen');
+    const levelButtonsRow = document.getElementById('levelButtonsRow');
+    const btnLevels = document.getElementById('btnLevels');
+    const btnBackFromLevels = document.getElementById('btnBackFromLevels');
+    const creditsModal = document.getElementById('creditsModal');
+    const btnCloseCredits = document.getElementById('btnCloseCredits');
+    const cutsceneScreen = document.getElementById('cutsceneScreen');
+    const cutsceneText = document.getElementById('cutsceneText');
+    const btnStory = document.getElementById('btnStory');
+    const btnCutsceneNext = document.getElementById('btnCutsceneNext');
+    const btnCutsceneSkip = document.getElementById('btnCutsceneSkip');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const discordUserId = urlParams.get('userId') || 'guest';
+
+    function analyzeSprite(img) {
+      try {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) return;
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const cctx = c.getContext('2d');
+        cctx.drawImage(img, 0, 0);
+        const data = cctx.getImageData(0, 0, w, h).data;
+        let minX = w, maxX = -1, minY = h, maxY = -1;
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            if (data[(y * w + x) * 4 + 3] > 12) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
+        }
+        if (maxX < 0) { minX = 0; maxX = w - 1; minY = 0; maxY = h - 1; }
+        img._bounds = { minX, maxX, minY, maxY };
+      } catch (e) {
+        img._bounds = { minX: 0, maxX: (img.naturalWidth || 1) - 1, minY: 0, maxY: (img.naturalHeight || 1) - 1 };
+      }
+    }
+
+    function loadImg(file) {
+      const img = new Image();
+      img.onload = () => analyzeSprite(img);
+      const isRootFolder = /^(Inimigos|Itens|Musicas)\//.test(file);
+      const base = isRootFolder ? '/plataforma/' : '/plataforma/assets/';
+      img.src = encodeURI(base + file);
+      return img;
+    }
+
+    function drawAnchored(img, centerX, bottomY, flip) {
+      if (!img || !img.complete || !img.naturalWidth) return;
+      const b = img._bounds || { minX: 0, maxX: img.naturalWidth - 1, minY: 0, maxY: img.naturalHeight - 1 };
+      const contentCenterX = (b.minX + b.maxX) / 2;
+      const footY = b.maxY + 1;
+      const drawY = bottomY - footY;
+      ctx.save();
+      if (flip) {
+        ctx.translate(centerX, drawY);
+        ctx.scale(-1, 1);
+        ctx.drawImage(img, -contentCenterX, 0);
+      } else {
+        ctx.drawImage(img, centerX - contentCenterX, drawY);
+      }
+      ctx.restore();
+    }
+
+    function loadSequence(folder, prefix, count, ext = '.png', pad = true) {
+      const arr = [];
+      for (let i = 1; i <= count; i++) {
+        const num = pad ? String(i).padStart(2, '0') : String(i);
+        const name = prefix ? `${prefix} ${num}${ext}` : `${num}${ext}`;
+        arr.push(loadImg(`${folder}/${name}`));
+      }
+      return arr;
+    }
+
+    // Cenário
+    const imgSky = loadImg('Additional Sky.png');
+    const imgWater = loadImg('Additional Water.png');
+    const imgClouds = loadImg('Big Clouds.png');
+    const animWaterReflect = [
+      loadImg('Water Reflect 01.png'), loadImg('Water Reflect 02.png'),
+      loadImg('Water Reflect 03.png'), loadImg('Water Reflect 04.png')
+    ];
+
+    const animPalm = [
+      loadImg('Back Palm Tree Regular 01.png'), loadImg('Back Palm Tree Regular 02.png'),
+      loadImg('Back Palm Tree Regular 03.png'), loadImg('Back Palm Tree Regular 04.png')
+    ];
+
+    const imgTerrain = loadImg('Terrain (32x32).png');
+
+    // Jogador Pirata
+    const animIdle = [loadImg('Idle 01.png'), loadImg('Idle 02.png'), loadImg('Idle 03.png'), loadImg('Idle 04.png'), loadImg('Idle 05.png')];
+    const animRun = [loadImg('Run 01.png'), loadImg('Run 02.png'), loadImg('Run 03.png'), loadImg('Run 04.png'), loadImg('Run 05.png'), loadImg('Run 06.png')];
+    const animJump = [loadImg('Jump 01.png')];
+    const animFall = [loadImg('Fall 01.png')];
+    const animHit = [loadImg('Hit 01.png')];
+
+    // Inimigos
+    const animCrabRun = loadSequence('Inimigos/caranguejo/Correndo', 'Run', 6);
+    const animShooterIdle = loadSequence('Inimigos/Atirador/Parado', '', 1, '.png', false);
+    const animShooterAttack = loadSequence('Inimigos/Atirador/Ataque', '', 6, '.png', false);
+    const animStarIdle = loadSequence('Inimigos/Inimigo 2/Parado', 'Idle', 8);
+    const animStarJump = loadSequence('Inimigos/Inimigo 2/Pulando', 'Jump', 3);
+    const animStarFall = loadSequence('Inimigos/Inimigo 2/Caindo', 'Fall', 1);
+    const animSkullEffect = loadSequence('Inimigos/Efeito caveira', '', 5);
+
+    // Itens
+    const animGoldenSkull = loadSequence('Itens/Golden Skull', '', 8);
+    const animGreenBottle = loadSequence('Itens/Green Bottle', '', 7);
+    const animRedPotion = loadSequence('Itens/Red Potion', '', 7);
+    const animGoldCoin = loadSequence('Itens/Gold Coin', '', 6);
+    const animCoinEffect = loadSequence('Itens/Coin Effect', '', 6);
+    const animPotionEffect = loadSequence('Itens/Potion Effect', '', 6);
+
+    // HUD
+    const imgAvatarPirate = loadImg('hud/avatar_pirata.png');
+    const imgHeart = loadImg('hud/coracao_barra.png');
+    const imgHeartEmpty = loadImg('hud/coracao_base.png');
+
+    // Música
+    const musicMenu = new Audio(encodeURI('/plataforma/Musicas/bgm_menu.mp3'));
+    musicMenu.loop = true;
+    musicMenu.volume = 0.5;
+    const actionTracks = [1, 2, 3, 4, 5].map(n => {
+      const a = new Audio(encodeURI(`/plataforma/Musicas/bgm_action_${n}.mp3`));
+      a.loop = true;
+      a.volume = 0.5;
+      return a;
+    });
+    let currentActionTrack = null;
+    let musicMuted = false;
+
+    function safePlay(audio) { if (!musicMuted) audio.play().catch(() => {}); }
+    function stopActionMusic() { actionTracks.forEach(a => a.pause()); currentActionTrack = null; }
+    function playMenuMusic() { stopActionMusic(); musicMenu.currentTime = 0; safePlay(musicMenu); }
+    function stopMenuMusic() { musicMenu.pause(); }
+    function playRandomActionMusic() {
+      stopMenuMusic();
+      currentActionTrack = actionTracks[Math.floor(Math.random() * actionTracks.length)];
+      currentActionTrack.currentTime = 0;
+      safePlay(currentActionTrack);
+    }
+    function pauseAllMusic() { musicMenu.pause(); actionTracks.forEach(a => a.pause()); }
+    function resumeMusic() {
+      if (gameState === 'PLAYING') { if (currentActionTrack) safePlay(currentActionTrack); }
+      else safePlay(musicMenu);
+    }
+    document.addEventListener('pointerdown', () => { if (gameState === 'MENU') safePlay(musicMenu); }, { once: true });
+
+    // SFX
+    let sfxCtx = null;
+    function getSfxCtx() {
+      if (!sfxCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) sfxCtx = new AC();
+      }
+      if (sfxCtx && sfxCtx.state === 'suspended') sfxCtx.resume();
+      return sfxCtx;
+    }
+    function beep({ freq = 440, end = freq, type = 'square', duration = 0.12, volume = 0.16, delay = 0 }) {
+      if (musicMuted) return;
+      const ac = getSfxCtx();
+      if (!ac) return;
+      const t0 = ac.currentTime + delay;
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t0);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(1, end), t0 + duration);
+      gain.gain.setValueAtTime(volume, t0);
+      gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+      osc.connect(gain).connect(ac.destination);
+      osc.start(t0);
+      osc.stop(t0 + duration + 0.02);
+    }
+    const Sfx = {
+      jump: () => beep({ freq: 380, end: 720, duration: 0.14, type: 'square' }),
+      doubleJump: () => beep({ freq: 500, end: 900, duration: 0.13, type: 'triangle' }),
+      coin: () => { beep({ freq: 880, end: 880, duration: 0.05, volume: 0.14 }); beep({ freq: 1320, end: 1320, duration: 0.12, volume: 0.14, delay: 0.05 }); },
+      stomp: () => beep({ freq: 260, end: 90, duration: 0.14, type: 'sawtooth' }),
+      hit: () => beep({ freq: 180, end: 60, duration: 0.22, type: 'sawtooth', volume: 0.2 }),
+      heal: () => beep({ freq: 500, end: 950, duration: 0.22, type: 'sine', volume: 0.15 }),
+      levelUp: () => beep({ freq: 400, end: 1200, duration: 0.3, type: 'triangle', volume: 0.18 }),
+      click: () => beep({ freq: 660, end: 500, duration: 0.06, volume: 0.12 }),
+      gameOver: () => beep({ freq: 220, end: 110, duration: 0.4, type: 'sawtooth' }),
+      victory: () => { beep({ freq: 520, end: 1040, duration: 0.3 }); beep({ freq: 780, end: 1560, duration: 0.3, delay: 0.15 }); }
+    };
+
+    const enemyProjectiles = [];
+    const particles = [];
+    const floatingTexts = [];
+    const effects = [];
+
+    function spawnEffect(animArr, x, y, w, h, frameDuration = 4) {
+      effects.push({ anim: animArr, x, y, w, h, frame: 0, timer: 0, frameDuration });
+    }
+
+    // Fases
+    const LEVELS = [
+      {
+        name: 'Praia Tranquila',
+        platforms: [
+          { x: 0, y: 260, w: 576, h: 100 },
+          { x: 640, y: 260, w: 384, h: 100 },
+          { x: 1088, y: 228, w: 416, h: 132 },
+          { x: 1568, y: 260, w: 640, h: 100 }
+        ],
+        enemies: [
+          { type: 'crab', x: 280, y: 236, w: 34, h: 24, vx: 1.2, minX: 180, maxX: 480 },
+          { type: 'star', x: 760, spawnY: 100, w: 28, h: 28, hopTimer: 60 },
+          { type: 'crab', x: 1200, y: 204, w: 34, h: 24, vx: 1.4, minX: 1100, maxX: 1380 }
+        ],
+        items: [
+          { type: 'potion_red', x: 220, y: 236, w: 18, h: 18, anim: 'animRedPotion' },
+          { type: 'coin', x: 480, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'coin', x: 520, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'potion_green', x: 900, y: 204, w: 18, h: 18, anim: 'animGreenBottle' }
+        ],
+        flagX: 2130
+      },
+      {
+        name: 'Recife Traiçoeiro',
+        platforms: [
+          { x: 0, y: 260, w: 400, h: 100 },
+          { x: 480, y: 260, w: 300, h: 100 },
+          { x: 860, y: 196, w: 220, h: 164 },
+          { x: 1160, y: 260, w: 260, h: 100 },
+          { x: 1500, y: 228, w: 300, h: 132 },
+          { x: 1880, y: 260, w: 500, h: 100 }
+        ],
+        enemies: [
+          { type: 'crab', x: 150, y: 236, w: 34, h: 24, vx: 1.3, minX: 40, maxX: 360 },
+          { type: 'turret', x: 560, y: 236, w: 28, h: 28 },
+          { type: 'star', x: 920, spawnY: 80, w: 28, h: 28, hopTimer: 50 },
+          { type: 'crab', x: 1200, y: 236, w: 34, h: 24, vx: 1.5, minX: 1180, maxX: 1380 },
+          { type: 'star', x: 1600, spawnY: 100, w: 28, h: 28, hopTimer: 70 }
+        ],
+        items: [
+          { type: 'potion_red', x: 250, y: 236, w: 18, h: 18, anim: 'animRedPotion' },
+          { type: 'coin', x: 660, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'coin', x: 700, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'potion_green', x: 940, y: 172, w: 18, h: 18, anim: 'animGreenBottle' },
+          { type: 'coin', x: 1560, y: 196, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'golden_skull', x: 2100, y: 236, w: 22, h: 22, anim: 'animGoldenSkull' }
+        ],
+        flagX: 2270
+      },
+      {
+        name: 'Caverna dos Ossos',
+        platforms: [
+          { x: 0, y: 260, w: 320, h: 100 },
+          { x: 430, y: 228, w: 180, h: 132 },
+          { x: 720, y: 196, w: 160, h: 164 },
+          { x: 990, y: 260, w: 200, h: 100 },
+          { x: 1300, y: 228, w: 160, h: 132 },
+          { x: 1570, y: 260, w: 200, h: 100 },
+          { x: 1880, y: 196, w: 220, h: 164 },
+          { x: 2210, y: 260, w: 520, h: 100 }
+        ],
+        enemies: [
+          { type: 'turret', x: 120, y: 236, w: 28, h: 28 },
+          { type: 'star', x: 470, spawnY: 60, w: 28, h: 28, hopTimer: 40 },
+          { type: 'crab', x: 750, y: 172, w: 34, h: 24, vx: 1.6, minX: 725, maxX: 855 },
+          { type: 'turret', x: 1050, y: 236, w: 28, h: 28 },
+          { type: 'star', x: 1340, spawnY: 80, w: 28, h: 28, hopTimer: 55 },
+          { type: 'crab', x: 1620, y: 236, w: 34, h: 24, vx: 1.7, minX: 1590, maxX: 1750 },
+          { type: 'star', x: 1950, spawnY: 60, w: 28, h: 28, hopTimer: 45 }
+        ],
+        items: [
+          { type: 'potion_red', x: 460, y: 172, w: 18, h: 18, anim: 'animRedPotion' },
+          { type: 'potion_red', x: 1330, y: 172, w: 18, h: 18, anim: 'animRedPotion' },
+          { type: 'coin', x: 1020, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'coin', x: 1060, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'potion_green', x: 1920, y: 172, w: 18, h: 18, anim: 'animGreenBottle' }
+        ],
+        flagX: 2660
+      },
+      {
+        name: 'Ilha da Caveira Dourada',
+        platforms: [
+          { x: 0, y: 260, w: 300, h: 100 },
+          { x: 440, y: 228, w: 150, h: 132 },
+          { x: 730, y: 196, w: 140, h: 164 },
+          { x: 1010, y: 260, w: 170, h: 100 },
+          { x: 1320, y: 228, w: 150, h: 132 },
+          { x: 1610, y: 260, w: 170, h: 100 },
+          { x: 1930, y: 196, w: 150, h: 164 },
+          { x: 2230, y: 260, w: 170, h: 100 },
+          { x: 2550, y: 228, w: 220, h: 132 },
+          { x: 2920, y: 260, w: 600, h: 100 }
+        ],
+        enemies: [
+          { type: 'crab', x: 120, y: 236, w: 34, h: 24, vx: 1.5, minX: 40, maxX: 260 },
+          { type: 'star', x: 480, spawnY: 60, w: 28, h: 28, hopTimer: 35 },
+          { type: 'turret', x: 780, y: 172, w: 28, h: 28 },
+          { type: 'star', x: 1040, spawnY: 80, w: 28, h: 28, hopTimer: 40 },
+          { type: 'turret', x: 1350, y: 236, w: 28, h: 28 },
+          { type: 'crab', x: 1640, y: 236, w: 34, h: 24, vx: 1.8, minX: 1615, maxX: 1755 },
+          { type: 'star', x: 1960, spawnY: 60, w: 28, h: 28, hopTimer: 35 },
+          { type: 'turret', x: 2260, y: 236, w: 28, h: 28 },
+          { type: 'star', x: 2580, spawnY: 80, w: 28, h: 28, hopTimer: 40 }
+        ],
+        items: [
+          { type: 'potion_red', x: 500, y: 172, w: 18, h: 18, anim: 'animRedPotion' },
+          { type: 'potion_red', x: 1370, y: 236, w: 18, h: 18, anim: 'animRedPotion' },
+          { type: 'potion_green', x: 1980, y: 172, w: 18, h: 18, anim: 'animGreenBottle' },
+          { type: 'coin', x: 2270, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'coin', x: 2310, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'coin', x: 2350, y: 236, w: 16, h: 16, anim: 'animGoldCoin' },
+          { type: 'golden_skull', x: 2960, y: 228, w: 24, h: 24, anim: 'animGoldenSkull' }
+        ],
+        flagX: 3390
+      }
+    ];
+
+    const ITEM_ANIM_MAP = {
+      animRedPotion, animGreenBottle, animGoldCoin, animGoldenSkull
+    };
+
+    let currentLevelIndex = 0;
+
+    // Física
+    const GRAVITY = 0.55;
+    const MAX_FALL = 11;
+    const MAX_SPEED = 3.6;
+    const ACCEL = 0.45;
+    const DECEL = 0.4;
+    const JUMP_FORCE = -9.6;
+    const DOUBLE_JUMP_FORCE = -8.2;
+    const COYOTE_FRAMES = 6;
+    const JUMP_BUFFER_FRAMES = 8;
+
+    let gameState = 'MENU';
+    let hp = 3, maxHp = 3, lives = 3, coinsCollected = 0;
+    const MAX_HP_CAP = 6;
+    let doubleJumpAvailable = true;
+    let invulnerableTimer = 0;
+    let coyoteTimer = 0;
+    let jumpBufferTimer = 0;
+    let cameraX = 0;
+    let cloudsX = 0;
+    let waterFrame = 0, waterTimer = 0;
+    let palmFrame = 0, palmTimer = 0;
+    let shakeTimer = 0, shakeMag = 0;
+    let squash = 1;
+
+    const keys = { l: false, r: false };
+
+    const player = {
+      x: 64, y: 236, w: 22, h: 24,
+      vx: 0, vy: 0,
+      onGround: false,
+      wasOnGround: false,
+      facingLeft: false,
+      state: 'idle',
+      frame: 0, frameTimer: 0
+    };
+
+    let platforms = [];
+    let LEVEL_WIDTH = 640;
+    let enemies = [];
+    let items = [];
+    const flagPole = { x: 0, y: 0, reached: false };
+
+    function loadLevel(index) {
+      const lvl = LEVELS[index];
+      currentLevelIndex = index;
+      platforms = lvl.platforms.map(p => ({ ...p }));
+      LEVEL_WIDTH = Math.max(...platforms.map(p => p.x + p.w));
+
+      enemies = lvl.enemies.map(e => {
+        const base = { ...e, dead: false, vx: e.vx || 0, vy: 0, onGround: false };
+        if (e.spawnY !== undefined) { base.y = e.spawnY; delete base.spawnY; }
+        return base;
+      });
+
+      items = lvl.items.map(it => ({ ...it, anim: ITEM_ANIM_MAP[it.anim], collected: false }));
+
+      const lastPlatform = platforms[platforms.length - 1];
+      flagPole.x = lvl.flagX !== undefined ? lvl.flagX : (lastPlatform.x + lastPlatform.w - 60);
+      flagPole.y = lastPlatform.y;
+      flagPole.reached = false;
+    }
+
+    function spawnParticles(x, y, count, color, spread = 2, life = 24) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * spread * 2,
+          vy: -Math.random() * spread - 0.5,
+          life, maxLife: life,
+          color
+        });
+      }
+    }
+
+    function spawnFloatingText(x, y, text, color) {
+      floatingTexts.push({ x, y, text, color, life: 45, maxLife: 45 });
+    }
+
+    function screenShake(mag, duration) {
+      shakeMag = mag;
+      shakeTimer = duration;
+    }
+
+    function resetPlayer() {
+      player.x = 64;
+      player.y = 236;
+      player.vx = 0;
+      player.vy = 0;
+      player.onGround = false;
+      invulnerableTimer = 60;
+    }
+
+    function takeDamage() {
+      if (invulnerableTimer > 0) return;
+      hp--;
+      invulnerableTimer = 90;
+      player.vy = -5;
+      player.vx = player.facingLeft ? 4.5 : -4.5;
+      player.state = 'hit';
+      screenShake(4, 14);
+      Sfx.hit();
+      spawnParticles(player.x + player.w / 2, player.y + player.h / 2, 8, '#ff0055', 3, 30);
+
+      if (hp <= 0) {
+        lives--;
+        if (lives <= 0) {
+          triggerGameOver();
+        } else {
+          hp = maxHp;
+          resetPlayer();
+        }
+      }
+    }
+
+    const GAME_OVER_LINES = [
+      'Eita, capitão! Bateu a bunda na quina e apagou!',
+      'Vish, rolou treta com a bicharada da ilha!',
+      'Foi de cara no chão igual pipoca de tapioca!',
+      'Bateu as botas, mas o mar já é assim mesmo!',
+      'Ih rapaz, essa fase comeu seu almoço!'
+    ];
+
+    async function triggerGameOver() {
+      gameState = 'GAMEOVER';
+      gameOverModal.classList.remove('hidden');
+      pauseBtn.classList.add('hidden');
+      muteBtn.classList.add('hidden');
+      stopActionMusic();
+      playMenuMusic();
+      Sfx.gameOver();
+      const earnedCoins = coinsCollected * 20;
+      const line = GAME_OVER_LINES[Math.floor(Math.random() * GAME_OVER_LINES.length)];
+      gameOverLineTxt.textContent = line;
+      gameOverLevelTxt.textContent = `Chegou até a Fase ${currentLevelIndex + 1} de ${LEVELS.length}`;
+      rewardTxt.textContent = `🪙 +${earnedCoins} NatashaCoins creditadas!`;
+
+      if (discordUserId !== 'guest' && earnedCoins > 0) {
+        try {
+          await fetch('/api/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: discordUserId, score: coinsCollected })
+          });
+        } catch (e) {}
+      }
+    }
+
+    function handleJump() {
+      jumpBufferTimer = JUMP_BUFFER_FRAMES;
+    }
+
+    function tryConsumeJumpBuffer() {
+      if (jumpBufferTimer <= 0) return;
+      if (player.onGround || coyoteTimer > 0) {
+        player.vy = JUMP_FORCE;
+        player.onGround = false;
+        coyoteTimer = 0;
+        jumpBufferTimer = 0;
+        squash = 1.25;
+        Sfx.jump();
+        spawnParticles(player.x + player.w / 2, player.y + player.h, 6, '#ffffff', 1.5, 16);
+      } else if (doubleJumpAvailable) {
+        player.vy = DOUBLE_JUMP_FORCE;
+        doubleJumpAvailable = false;
+        jumpBufferTimer = 0;
+        squash = 1.3;
+        Sfx.doubleJump();
+        spawnParticles(player.x + player.w / 2, player.y + player.h / 2, 10, '#38bdf8', 2, 20);
+      }
+    }
+
+    function update() {
+      cloudsX = (cloudsX + 0.2) % 440;
+
+      waterTimer++;
+      if (waterTimer % 8 === 0) waterFrame = (waterFrame + 1) % 4;
+
+      palmTimer++;
+      if (palmTimer % 12 === 0) palmFrame = (palmFrame + 1) % 4;
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const t = floatingTexts[i];
+        t.y -= 0.5; t.life--;
+        if (t.life <= 0) floatingTexts.splice(i, 1);
+      }
+      if (shakeTimer > 0) shakeTimer--;
+      squash += (1 - squash) * 0.2;
+
+      if (gameState !== 'PLAYING') return;
+
+      if (invulnerableTimer > 0) invulnerableTimer--;
+      if (coyoteTimer > 0) coyoteTimer--;
+      if (jumpBufferTimer > 0) jumpBufferTimer--;
+
+      if (keys.l) {
+        player.vx = Math.max(player.vx - ACCEL, -MAX_SPEED);
+        player.facingLeft = true;
+      } else if (keys.r) {
+        player.vx = Math.min(player.vx + ACCEL, MAX_SPEED);
+        player.facingLeft = false;
+      } else {
+        if (player.vx > 0) player.vx = Math.max(0, player.vx - DECEL);
+        else if (player.vx < 0) player.vx = Math.min(0, player.vx + DECEL);
+      }
+
+      const prevBottom = player.y + player.h;
+
+      // Colisão horizontal
+      player.x += player.vx;
+      platforms.forEach(p => {
+        const meaningfulOverlap = player.y + player.h > p.y + 6 && player.y < p.y + p.h;
+        if (meaningfulOverlap && player.x + player.w > p.x && player.x < p.x + p.w) {
+          if (player.vx > 0) player.x = p.x - player.w;
+          else if (player.vx < 0) player.x = p.x + p.w;
+          player.vx = 0;
+        }
+      });
+      player.x = Math.max(0, Math.min(player.x, LEVEL_WIDTH - player.w));
+
+      // Colisão vertical
+      player.vy = Math.min(player.vy + GRAVITY, MAX_FALL);
+      player.y += player.vy;
+      player.wasOnGround = player.onGround;
+      player.onGround = false;
+
+      platforms.forEach(p => {
+        const withinX = player.x + player.w > p.x + 2 && player.x < p.x + p.w - 2;
+        const cameFromAbove = prevBottom <= p.y + 1;
+        const nowInsideOrBelow = player.y + player.h >= p.y;
+        if (withinX && cameFromAbove && player.vy >= 0 && nowInsideOrBelow) {
+          player.y = p.y - player.h;
+          player.vy = 0;
+          player.onGround = true;
+          doubleJumpAvailable = true;
+        }
+      });
+
+      if (player.onGround && !player.wasOnGround) {
+        squash = 0.7;
+        spawnParticles(player.x + player.w / 2, player.y + player.h, 5, '#e8e8e8', 1.2, 14);
+      }
+      if (!player.onGround && player.wasOnGround) {
+        coyoteTimer = COYOTE_FRAMES;
+      }
+
+      tryConsumeJumpBuffer();
+
+      if (player.y > 380) {
+        takeDamage();
+        resetPlayer();
+      }
+
+      if (invulnerableTimer > 60) player.state = 'hit';
+      else if (!player.onGround) player.state = player.vy < 0 ? 'jump' : 'fall';
+      else if (Math.abs(player.vx) > 0.3) player.state = 'run';
+      else player.state = 'idle';
+
+      player.frameTimer++;
+      if (player.frameTimer % 5 === 0) player.frame++;
+
+      // Inimigos
+      enemies.forEach(e => {
+        if (e.dead) return;
+        const enemyPrevBottom = e.y + e.h;
+
+        if (e.type === 'crab') {
+          e.x += e.vx;
+          if (e.x <= e.minX || e.x >= e.maxX) e.vx *= -1;
+          // FLIP CORRIGIDO: Se vx < 0 (esquerda) -> flip horizontal
+          e.facingLeft = e.vx < 0;
+
+        } else if (e.type === 'star') {
+          e.vy = (e.vy || 0);
+          e.vx = (e.vx || 0);
+          e.onGround = e.onGround || false;
+          e.hopTimer = (e.hopTimer !== undefined ? e.hopTimer : 60) - 1;
+
+          if (e.onGround) {
+            e.vx *= 0.8;
+            if (e.hopTimer <= 0) {
+              const dir = player.x < e.x ? -1 : 1;
+              e.vx = dir * 1.7;
+              e.vy = -7.5;
+              e.onGround = false;
+              e.hopTimer = 70 + Math.floor(Math.random() * 40);
+            }
+          }
+
+          e.vy = Math.min(e.vy + GRAVITY, MAX_FALL);
+          e.x += e.vx;
+          e.y += e.vy;
+
+          const wasOnGround = e.onGround;
+          e.onGround = false;
+          platforms.forEach(p => {
+            const withinX = e.x + e.w > p.x + 2 && e.x < p.x + p.w - 2;
+            if (withinX && e.vy >= 0 && (e.y + e.h) >= p.y && (e.y + e.h - e.vy) <= p.y + 2) {
+              e.y = p.y - e.h;
+              e.vy = 0;
+              e.onGround = true;
+            }
+          });
+
+          e.facingLeft = e.vx < 0;
+          e.hopState = !e.onGround ? (e.vy < 0 ? 'jump' : 'fall') : 'idle';
+
+        } else if (e.type === 'turret') {
+          // FLIP CORRIGIDO: Olha e atira sempre na direção do pirata
+          e.facingLeft = player.x < e.x;
+
+          e.shootTimer = (e.shootTimer || 0) + 1;
+          if (!e.attacking && e.shootTimer >= 150) {
+            e.attacking = true;
+            e.attackFrame = 0;
+            e.shootTimer = 0;
+          }
+          if (e.attacking) {
+            e.attackFrame++;
+            if (e.attackFrame === 18) {
+              const dir = e.facingLeft ? -3.5 : 3.5;
+              enemyProjectiles.push({ x: e.x + e.w / 2, y: e.y + e.h / 2, vx: dir, r: 5 });
+            }
+            if (e.attackFrame > 34) e.attacking = false;
+          }
+        }
+
+        const overlapping = player.x + player.w > e.x + 2 && player.x < e.x + e.w - 2 &&
+          player.y + player.h > e.y + 2 && player.y < e.y + e.h;
+
+        if (overlapping) {
+          const stomping = player.vy > 0 && prevBottom <= enemyPrevBottom + 10;
+          if (stomping) {
+            e.dead = true;
+            player.vy = JUMP_FORCE * 0.7;
+            coinsCollected += 2;
+            Sfx.stomp();
+            spawnEffect(animSkullEffect, e.x + e.w / 2 - 16, e.y + e.h / 2 - 16, 32, 32, 5);
+            spawnFloatingText(e.x + e.w / 2, e.y, '+2', '#ffd700');
+          } else {
+            takeDamage();
+          }
+        }
+      });
+
+      // Projéteis
+      for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+        const pr = enemyProjectiles[i];
+        pr.x += pr.vx;
+
+        if (pr.x > player.x && pr.x < player.x + player.w &&
+            pr.y > player.y && pr.y < player.y + player.h) {
+          takeDamage();
+          enemyProjectiles.splice(i, 1);
+          continue;
+        }
+
+        if (pr.x < cameraX - 50 || pr.x > cameraX + V_WIDTH + 50) {
+          enemyProjectiles.splice(i, 1);
+        }
+      }
+
+      // Efeitos animados
+      for (let i = effects.length - 1; i >= 0; i--) {
+        const fx = effects[i];
+        fx.timer++;
+        if (fx.timer % fx.frameDuration === 0) fx.frame++;
+        if (fx.frame >= fx.anim.length) effects.splice(i, 1);
+      }
+
+      // Itens
+      items.forEach(it => {
+        if (it.collected) return;
+        if (player.x + player.w > it.x && player.x < it.x + it.w &&
+            player.y + player.h > it.y && player.y < it.y + it.h) {
+          it.collected = true;
+
+          if (it.type === 'coin') {
+            coinsCollected++;
+            Sfx.coin();
+            spawnFloatingText(it.x + it.w / 2, it.y, '+1', '#ffd700');
+            spawnEffect(animCoinEffect, it.x + it.w / 2 - 16, it.y + it.h / 2 - 16, 32, 32, 4);
+          } else if (it.type === 'potion_red') {
+            if (hp < maxHp) hp++;
+            Sfx.heal();
+            spawnFloatingText(it.x + it.w / 2, it.y, '+1 HP', '#ff5577');
+            spawnEffect(animPotionEffect, it.x + it.w / 2 - 16, it.y + it.h / 2 - 16, 32, 32, 4);
+          } else if (it.type === 'potion_green') {
+            hp = maxHp;
+            Sfx.heal();
+            spawnFloatingText(it.x + it.w / 2, it.y, 'HP CHEIO', '#00ff66');
+            spawnEffect(animPotionEffect, it.x + it.w / 2 - 16, it.y + it.h / 2 - 16, 32, 32, 4);
+          } else if (it.type === 'golden_skull') {
+            if (maxHp < MAX_HP_CAP) maxHp++;
+            hp = maxHp;
+            Sfx.levelUp();
+            spawnFloatingText(it.x + it.w / 2, it.y, '+1 HP MÁX!', '#ffd700');
+            spawnEffect(animSkullEffect, it.x + it.w / 2 - 16, it.y + it.h / 2 - 16, 32, 32, 5);
+          }
+        }
+      });
+
+      // Bandeira de chegada
+      if (!flagPole.reached && player.x + player.w > flagPole.x) {
+        flagPole.reached = true;
+        finishLevel();
+      }
+
+      cameraX = Math.max(0, Math.min(player.x - V_WIDTH * 0.35, LEVEL_WIDTH - V_WIDTH));
+    }
+
+    function finishLevel() {
+      const bonus = 30 + currentLevelIndex * 10;
+      coinsCollected += bonus;
+      stopActionMusic();
+
+      if (currentLevelIndex >= LEVELS.length - 1) {
+        gameState = 'VICTORY';
+        pauseBtn.classList.add('hidden');
+        muteBtn.classList.add('hidden');
+        touchControls.classList.add('hidden');
+        Sfx.victory();
+        playMenuMusic();
+        victoryCoinsTxt.textContent = `🪙 Total: ${coinsCollected} NatashaCoins!`;
+        victoryModal.classList.remove('hidden');
+
+        if (discordUserId !== 'guest') {
+          fetch('/api/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: discordUserId, score: coinsCollected })
+          }).catch(() => {});
+        }
+      } else {
+        gameState = 'LEVEL_COMPLETE';
+        pauseBtn.classList.add('hidden');
+        muteBtn.classList.add('hidden');
+        touchControls.classList.add('hidden');
+        Sfx.levelUp();
+        levelCompleteTitleTxt.textContent = `FASE ${currentLevelIndex + 1} CONCLUÍDA!`;
+        levelCompleteBonusTxt.textContent = `🪙 +${bonus} de bônus — total: ${coinsCollected}`;
+        levelCompleteModal.classList.remove('hidden');
+      }
+    }
+
+    function draw() {
+      const scale = Math.max(canvas.width / V_WIDTH, canvas.height / V_HEIGHT);
+      const offsetX = (canvas.width - V_WIDTH * scale) / 2;
+      const offsetY = (canvas.height - V_HEIGHT * scale) / 2;
+
+      let shakeX = 0, shakeY = 0;
+      if (shakeTimer > 0) {
+        shakeX = (Math.random() - 0.5) * shakeMag;
+        shakeY = (Math.random() - 0.5) * shakeMag;
+      }
+
+      ctx.save();
+      ctx.translate(offsetX + shakeX, offsetY + shakeY);
+      ctx.scale(scale, scale);
+
+      // 1. Céu
+      if (imgSky.complete && imgSky.naturalWidth > 0) {
+        ctx.drawImage(imgSky, 0, 0, V_WIDTH, 200);
+      } else {
+        ctx.fillStyle = '#fce2c4';
+        ctx.fillRect(0, 0, V_WIDTH, 200);
+      }
+
+      // 2. Nuvens
+      if (imgClouds.complete && imgClouds.naturalWidth > 0) {
+        const cx = (cloudsX - cameraX * 0.08) % 440;
+        ctx.drawImage(imgClouds, cx - 440, 105, 440, 95);
+        ctx.drawImage(imgClouds, cx, 105, 440, 95);
+        ctx.drawImage(imgClouds, cx + 440, 105, 440, 95);
+        ctx.drawImage(imgClouds, cx + 880, 105, 440, 95);
+      }
+
+      // 3. Mar
+      if (imgWater.complete && imgWater.naturalWidth > 0) {
+        ctx.drawImage(imgWater, 0, 200, V_WIDTH, 160);
+      } else {
+        ctx.fillStyle = '#6599b8';
+        ctx.fillRect(0, 200, V_WIDTH, 160);
+      }
+
+      // 4. Reflexo da água
+      const curReflect = animWaterReflect[waterFrame];
+      if (curReflect && curReflect.complete && curReflect.naturalWidth > 0) {
+        const rw = curReflect.naturalWidth;
+        const rh = curReflect.naturalHeight;
+        for (let rx = -rw; rx < V_WIDTH + rw; rx += rw) {
+          ctx.drawImage(curReflect, rx - ((cameraX * 0.15) % rw), 195, rw, rh);
+        }
+      }
+
+      ctx.save();
+      ctx.translate(-cameraX, 0);
+
+      // 5. Palmeiras animadas
+      const curPalm = animPalm[palmFrame];
+      [80, 420, 800, 1240].forEach(px => {
+        if (curPalm && curPalm.complete && curPalm.naturalWidth > 0) {
+          ctx.drawImage(curPalm, px, 132, 64, 128);
+        }
+      });
+
+      // 6. Terreno da ilha
+      const hasTerrain = imgTerrain.complete && imgTerrain.naturalWidth > 0;
+      platforms.forEach(p => {
+        for (let bx = p.x; bx < p.x + p.w; bx += 32) {
+          const isLeft = (bx === p.x);
+          const isRight = (bx + 32 >= p.x + p.w);
+
+          if (hasTerrain) {
+            let sx = isLeft ? 0 : (isRight ? 64 : 32);
+            ctx.drawImage(imgTerrain, sx, 0, 32, 32, bx, p.y, 32, 32);
+          } else {
+            ctx.fillStyle = '#4ade80';
+            ctx.fillRect(bx, p.y, 32, 8);
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(bx, p.y + 8, 32, 24);
+          }
+
+          for (let by = p.y + 32; by < p.y + p.h; by += 32) {
+            if (hasTerrain) {
+              let fillSx = isLeft ? 0 : (isRight ? 64 : 32);
+              ctx.drawImage(imgTerrain, fillSx, 32, 32, 32, bx, by, 32, 32);
+            } else {
+              ctx.fillStyle = '#78350f';
+              ctx.fillRect(bx, by, 32, 32);
+            }
+          }
+        }
+      });
+
+      // 6b. Bandeira de chegada
+      {
+        const poleH = 96;
+        const baseY = flagPole.y;
+        const waveFrame = Math.floor(Date.now() / 200) % 2;
+        ctx.fillStyle = '#8b5a2b';
+        ctx.fillRect(flagPole.x - 2, baseY - poleH, 4, poleH);
+        ctx.fillStyle = '#c98a3f';
+        ctx.beginPath();
+        ctx.arc(flagPole.x, baseY - poleH, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = flagPole.reached ? '#22c55e' : '#ffd700';
+        ctx.beginPath();
+        ctx.moveTo(flagPole.x + 2, baseY - poleH + 6);
+        ctx.lineTo(flagPole.x + 26 + waveFrame * 2, baseY - poleH + 14);
+        ctx.lineTo(flagPole.x + 2, baseY - poleH + 22);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#3a2411';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // 7. Itens
+      items.forEach(it => {
+        if (it.collected) return;
+        const validFrames = (it.anim || []).filter(i => i.complete && i.naturalWidth > 0);
+        if (validFrames.length > 0) {
+          const frameImg = validFrames[Math.floor(Date.now() / 160) % validFrames.length];
+          drawAnchored(frameImg, it.x + it.w / 2, it.y + it.h, false);
+        } else {
+          ctx.fillStyle = it.type === 'coin' ? '#ffd700' : (it.type === 'golden_skull' ? '#f5c518' : '#22c55e');
+          ctx.fillRect(it.x, it.y, it.w, it.h);
+        }
+      });
+
+      // 8. Inimigos (com FLIP e desenho corretos)
+      enemies.forEach(e => {
+        if (e.dead) return;
+        let animArr, flip = !!e.facingLeft;
+
+        if (e.type === 'crab') {
+          animArr = animCrabRun;
+        } else if (e.type === 'star') {
+          animArr = e.hopState === 'jump' ? animStarJump : (e.hopState === 'fall' ? animStarFall : animStarIdle);
+        } else if (e.type === 'turret') {
+          animArr = e.attacking ? animShooterAttack : animShooterIdle;
+        }
+
+        const validFrames = (animArr || []).filter(i => i.complete && i.naturalWidth > 0);
+
+        if (validFrames.length > 0) {
+          let frameImg;
+          if (e.type === 'turret' && e.attacking) {
+            frameImg = validFrames[Math.min(validFrames.length - 1, Math.floor(e.attackFrame / 6))];
+          } else {
+            frameImg = validFrames[Math.floor(Date.now() / 140) % validFrames.length];
+          }
+          drawAnchored(frameImg, e.x + e.w / 2, e.y + e.h, flip);
+        } else {
+          ctx.fillStyle = e.type === 'crab' ? '#e11d48' : (e.type === 'star' ? '#ec4899' : '#a855f7');
+          ctx.fillRect(e.x, e.y, e.w, e.h);
+        }
+      });
+
+      // 9. Projéteis
+      enemyProjectiles.forEach(pr => {
+        ctx.fillStyle = '#ff0055';
+        ctx.beginPath();
+        ctx.arc(pr.x, pr.y, pr.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+
+      // 9b. Efeitos animados
+      effects.forEach(fx => {
+        const frameImg = fx.anim[Math.min(fx.frame, fx.anim.length - 1)];
+        if (frameImg && frameImg.complete && frameImg.naturalWidth > 0) {
+          ctx.drawImage(frameImg, fx.x, fx.y, fx.w, fx.h);
+        }
+      });
+
+      // 10. Pirata
+      if (invulnerableTimer % 6 < 3) {
+        let animList = animIdle;
+        if (player.state === 'run') animList = animRun;
+        else if (player.state === 'jump') animList = animJump;
+        else if (player.state === 'fall') animList = animFall;
+        else if (player.state === 'hit') animList = animHit;
+
+        const validFrames = animList.filter(img => img.complete && img.naturalWidth > 0);
+        const currentImg = validFrames.length > 0 ? validFrames[player.frame % validFrames.length] : null;
+
+        const centerX = player.x + player.w / 2;
+        const bottomY = player.y + player.h;
+
+        if (currentImg) {
+          ctx.save();
+          ctx.translate(centerX, bottomY);
+          ctx.scale(1 / squash, squash);
+          ctx.translate(-centerX, -bottomY);
+          drawAnchored(currentImg, centerX, bottomY, player.facingLeft);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = '#ffcc00';
+          ctx.fillRect(player.x, player.y, player.w, player.h);
+        }
+      }
+
+      // 11. Partículas
+      particles.forEach(p => {
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x - 1.5, p.y - 1.5, 3, 3);
+        ctx.globalAlpha = 1;
+      });
+
+      // 12. Textos flutuantes
+      floatingTexts.forEach(t => {
+        ctx.globalAlpha = Math.max(0, t.life / t.maxLife);
+        ctx.fillStyle = t.color;
+        ctx.font = 'bold 12px ArcadeFont, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(t.text, t.x, t.y);
+        ctx.globalAlpha = 1;
+        ctx.textAlign = 'left';
+      });
+
+      ctx.restore();
+      ctx.restore();
+
+      // 13. HUD
+      if (gameState === 'PLAYING' || gameState === 'PAUSED') {
+        const hudX = 18;
+        const hudY = 14;
+        const avatarSize = 44;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(hudX, hudY, avatarSize, avatarSize, 8);
+        ctx.fillStyle = '#1c0f05';
+        ctx.fill();
+        ctx.clip();
+        if (imgAvatarPirate.complete && imgAvatarPirate.naturalWidth > 0) {
+          ctx.drawImage(imgAvatarPirate, hudX, hudY, avatarSize, avatarSize);
+        }
+        ctx.restore();
+        ctx.strokeStyle = '#2b1608';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(hudX, hudY, avatarSize, avatarSize, 8);
+        ctx.stroke();
+
+        const heartSize = maxHp > 4 ? 16 : 22;
+        const heartsPerRow = 4;
+        for (let i = 1; i <= maxHp; i++) {
+          const row = Math.floor((i - 1) / heartsPerRow);
+          const col = (i - 1) % heartsPerRow;
+          const hx = hudX + avatarSize + 8 + col * (heartSize + 2);
+          const hy = hudY + row * (heartSize + 4);
+          const heartImg = (i <= hp) ? imgHeart : imgHeartEmpty;
+          if (heartImg.complete && heartImg.naturalWidth > 0) {
+            ctx.drawImage(heartImg, hx, hy, heartSize, heartSize);
+          } else {
+            ctx.fillStyle = i <= hp ? '#ef4444' : '#555555';
+            ctx.fillRect(hx, hy + 3, heartSize - 4, heartSize - 6);
+          }
+        }
+
+        const livesLabel = `X${lives < 10 ? '0' + lives : lives}`;
+        ctx.font = 'bold 22px ArcadeFont, monospace';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#2b1608';
+        ctx.strokeText(livesLabel, hudX, hudY + avatarSize + 26);
+        ctx.fillStyle = '#ffd700';
+        ctx.fillText(livesLabel, hudX, hudY + avatarSize + 26);
+
+        const coinLabel = `🪙 ${coinsCollected}`;
+        const coinBadgeW = 74;
+        const coinBadgeX = canvas.width - coinBadgeW - 24;
+        ctx.fillStyle = 'rgba(43, 22, 8, 0.75)';
+        ctx.beginPath();
+        ctx.roundRect(coinBadgeX, hudY, coinBadgeW, 30, 8);
+        ctx.fill();
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 13px ArcadeFont, monospace';
+        ctx.fillText(coinLabel, coinBadgeX + 8, hudY + 20);
+
+        const barW = 160;
+        const barX = canvas.width - barW - 24;
+        const barY = hudY + 38;
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 10px ArcadeFont, monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(`Fase ${currentLevelIndex + 1}/${LEVELS.length} — ${LEVELS[currentLevelIndex].name}`, barX + barW, barY - 3);
+        ctx.textAlign = 'left';
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(barX, barY, barW, 10);
+        const progress = Math.min(1, (player.x - 40) / (flagPole.x - 40));
+        ctx.fillStyle = '#ffd700';
+        ctx.fillRect(barX, barY, barW * Math.max(0, progress), 10);
+        ctx.strokeStyle = '#000';
+        ctx.strokeRect(barX, barY, barW, 10);
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    function hideAllScreens() {
+      menuScreen.style.display = 'none';
+      gameOverModal.classList.add('hidden');
+      pauseModal.classList.add('hidden');
+      levelCompleteModal.classList.add('hidden');
+      victoryModal.classList.add('hidden');
+      levelSelectScreen.classList.add('hidden');
+      creditsModal.classList.add('hidden');
+      cutsceneScreen.classList.add('hidden');
+    }
+
+    function showMenu() {
+      hideAllScreens();
+      touchControls.classList.add('hidden');
+      pauseBtn.classList.add('hidden');
+      muteBtn.classList.add('hidden');
+      menuScreen.style.display = 'flex';
+      gameState = 'MENU';
+      stopActionMusic();
+      playMenuMusic();
+    }
+
+    function startLevel(index) {
+      loadLevel(index);
+      gameState = 'PLAYING';
+      hideAllScreens();
+      touchControls.classList.remove('hidden');
+      pauseBtn.classList.remove('hidden');
+      muteBtn.classList.remove('hidden');
+      enemyProjectiles.length = 0;
+      particles.length = 0;
+      floatingTexts.length = 0;
+      effects.length = 0;
+      resetPlayer();
+      playRandomActionMusic();
+    }
+
+    function beginRun(index) {
+      maxHp = 3;
+      hp = 3;
+      lives = 3;
+      coinsCollected = 0;
+      startLevel(index);
+    }
+
+    function togglePause() {
+      if (gameState === 'PLAYING') {
+        gameState = 'PAUSED';
+        pauseModal.classList.remove('hidden');
+        pauseAllMusic();
+      } else if (gameState === 'PAUSED') {
+        gameState = 'PLAYING';
+        pauseModal.classList.add('hidden');
+        resumeMusic();
+      }
+    }
+
+    function toggleMute() {
+      musicMuted = !musicMuted;
+      muteBtn.textContent = musicMuted ? '🔇' : '🔊';
+      if (musicMuted) pauseAllMusic();
+      else resumeMusic();
+    }
+
+    function openLevelSelect() {
+      hideAllScreens();
+      levelSelectScreen.classList.remove('hidden');
+      levelButtonsRow.innerHTML = '';
+      LEVELS.forEach((lvl, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'menu-wood-btn';
+        btn.style.cssText = 'width: 150px; height: 70px; font-size: 15px; flex-direction: column; gap: 4px;';
+        btn.innerHTML = `FASE ${i + 1}<span style="font-size:11px; font-weight:normal;">${lvl.name}</span>`;
+        btn.onclick = () => { Sfx.click(); beginRun(i); };
+        levelButtonsRow.appendChild(btn);
+      });
+    }
+
+    const CUTSCENE_SLIDES = [
+      { art: '🏴‍☠️', text: 'Nas águas mornas do Caribe brasileiro, um pirata teimoso chamado Capitão Coco Salgado ouviu um caso de bar que mudaria sua vida...' },
+      { art: '🦴', text: 'Dizem que existe uma CAVEIRA DOURADA escondida em quatro ilhas traiçoeiras — e quem encontrar nunca mais paga rodízio de novo!' },
+      { art: '🦀', text: 'Só que as ilhas estão cheias de caranguejo arretado, estrela-do-mar saltitante e canhão que não tá pra brincadeira.' },
+      { art: '⚓', text: 'Capitão Coco ajeitou o chapéu, encheu a cantil de guaraná e partiu rumo à aventura. Bora com ele, marujo?' }
+    ];
+    let cutsceneIndex = 0;
+    let cutsceneMode = 'intro';
+    let introSeen = false;
+
+    function showCutsceneSlide() {
+      const slide = CUTSCENE_SLIDES[cutsceneIndex];
+      document.getElementById('cutsceneArt').textContent = slide.art;
+      cutsceneText.textContent = slide.text;
+      btnCutsceneNext.textContent = cutsceneIndex === CUTSCENE_SLIDES.length - 1 ? 'BORA! ▶' : 'AVANÇAR ▶';
+    }
+
+    function openCutscene(mode) {
+      cutsceneMode = mode;
+      cutsceneIndex = 0;
+      hideAllScreens();
+      cutsceneScreen.classList.remove('hidden');
+      showCutsceneSlide();
+    }
+
+    function advanceCutscene() {
+      Sfx.click();
+      cutsceneIndex++;
+      if (cutsceneIndex >= CUTSCENE_SLIDES.length) {
+        if (cutsceneMode === 'intro') beginRun(0);
+        else showMenu();
+      } else {
+        showCutsceneSlide();
+      }
+    }
+
+    btnPlay.onclick = () => {
+      Sfx.click();
+      if (!introSeen) { introSeen = true; openCutscene('intro'); }
+      else beginRun(0);
+    };
+    btnStory.onclick = () => { Sfx.click(); introSeen = true; openCutscene('replay'); };
+    btnCutsceneNext.onclick = advanceCutscene;
+    btnCutsceneSkip.onclick = () => {
+      Sfx.click();
+      if (cutsceneMode === 'intro') beginRun(0);
+      else showMenu();
+    };
+
+    btnLevels.onclick = () => { Sfx.click(); openLevelSelect(); };
+    btnBackFromLevels.onclick = () => { Sfx.click(); showMenu(); };
+
+    document.getElementById('btnCredits').onclick = () => { Sfx.click(); hideAllScreens(); creditsModal.classList.remove('hidden'); };
+    btnCloseCredits.onclick = () => { Sfx.click(); showMenu(); };
+
+    document.getElementById('btnOptions').onclick = () => { Sfx.click(); alert('Áudio: 100% | Dificuldade: Normal'); };
+
+    restartBtn.onclick = () => { Sfx.click(); beginRun(currentLevelIndex); };
+    gameOverMenuBtn.onclick = () => { Sfx.click(); showMenu(); };
+    resumeBtn.onclick = togglePause;
+    pauseBtn.onclick = togglePause;
+    muteBtn.onclick = toggleMute;
+    btnNextLevel.onclick = () => { Sfx.click(); startLevel(currentLevelIndex + 1); };
+    btnVictoryMenu.onclick = () => { Sfx.click(); showMenu(); };
+
+    window.addEventListener('keydown', e => {
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.l = true;
+      if (['ArrowRight', 'KeyD'].includes(e.code)) keys.r = true;
+      if (['Space', 'KeyW', 'ArrowUp'].includes(e.code)) {
+        if (gameState === 'PLAYING') handleJump();
+        else if (gameState === 'MENU') btnPlay.onclick();
+      }
+      if (e.code === 'Escape' || e.code === 'KeyP') {
+        if (gameState === 'PLAYING' || gameState === 'PAUSED') togglePause();
+      }
+    });
+    window.addEventListener('keyup', e => {
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.l = false;
+      if (['ArrowRight', 'KeyD'].includes(e.code)) keys.r = false;
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && gameState === 'PLAYING') togglePause();
+    });
+
+    const bindTouch = (id, onDown, onUp) => {
+      const el = document.getElementById(id);
+      el.addEventListener('pointerdown', e => { e.preventDefault(); onDown(); });
+      el.addEventListener('pointerup', e => { e.preventDefault(); onUp(); });
+      el.addEventListener('pointerleave', () => onUp());
+    };
+    bindTouch('btnLeft', () => keys.l = true, () => keys.l = false);
+    bindTouch('btnRight', () => keys.r = true, () => keys.r = false);
+    document.getElementById('btnJump').addEventListener('pointerdown', e => { e.preventDefault(); handleJump(); });
+
+    loadLevel(0);
+    loop();
+    playMenuMusic();
+  </script>
+</body>
+</html>

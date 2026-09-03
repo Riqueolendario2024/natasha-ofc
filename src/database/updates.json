@@ -1,0 +1,253 @@
+{
+  "knownCommands": [
+    "menu",
+    "apostar",
+    "attp",
+    "banco",
+    "batalha",
+    "beijar",
+    "bingo",
+    "blackjack",
+    "boasvindas",
+    "bolsa",
+    "bomba",
+    "trair",
+    "corrida",
+    "roubar",
+    "crime",
+    "curiosidade",
+    "curso",
+    "daily",
+    "doc",
+    "duelo",
+    "dungeon",
+    "engine",
+    "enquete",
+    "eununca",
+    "exercicio",
+    "verdadedesafio",
+    "falar",
+    "forca",
+    "gemini",
+    "genio",
+    "godot",
+    "abraco",
+    "jokenpo",
+    "presentear",
+    "loja",
+    "gay",
+    "mineracao",
+    "missao",
+    "namorar",
+    "natashastatus",
+    "noticias",
+    "cantada",
+    "paciencia",
+    "perfil-card",
+    "pesca",
+    "ping",
+    "play",
+    "quiz",
+    "rank",
+    "rankcoins",
+    "ranking",
+    "topxp",
+    "rank-corno",
+    "cassino-roleta",
+    "saldo",
+    "sokoban",
+    "trabalhar",
+    "tutorial",
+    "velha",
+    "block-palavra",
+    "boasvindas_toggle",
+    "fechar-grupo",
+    "limpar",
+    "marcar-todos",
+    "sorteio",
+    "updates",
+    "admincoins",
+    "apagar",
+    "autoresponder",
+    "eval",
+    "doar",
+    "perfil",
+    "adverter",
+    "banir",
+    "mute",
+    "relacionamento",
+    "afk",
+    "correio-anonimo",
+    "lembrete",
+    "letra",
+    "resumo-chat",
+    "corno",
+    "feio",
+    "gado",
+    "flappy",
+    "galaxy",
+    "plataforma"
+  ],
+  "history": [
+    {
+      "id": "upd_1788112572683",
+      "version": "2.5.0",
+      "date": "30/08/2026",
+      "timestamp": 1788112572763,
+      "items": [
+        {
+          "name": "plataforma",
+          "category": "games",
+          "description": "Jogue o Pirate Adventure a 60 FPS no PC ou Celular!",
+          "emoji": "🏴‍☠️"
+        }
+      ]
+    },
+    {
+      "id": "upd_1788108267698",
+      "version": "2.5.0",
+      "date": "30/08/2026",
+      "timestamp": 1788108267745,
+      "items": [
+        {
+          "name": "galaxy",
+          "category": "games",
+          "description": "Jogue o clássico Cyber Galaxy Space Shooter a 60 FPS com lasers e naves inimigas!",
+          "emoji": "🚀"
+        }
+      ]
+    },
+    {
+      "id": "upd_1788105926510",
+      "version": "2.5.0",
+      "date": "30/08/2026",
+      "timestamp": 1788105926618,
+      "items": [
+        {
+          "name": "flappy",
+          "category": "games",
+          "description": "Jogue o clássico Flappy Bird / Sky Hop interativo direto no Discord!",
+          "emoji": "🐥"
+        }
+      ]
+    },
+    {
+      "id": "upd_1788104348809",
+      "version": "2.5.0",
+      "date": "30/08/2026",
+      "timestamp": 1788104348926,
+      "items": [
+        {
+          "name": "corno",
+          "category": "games",
+          "description": "Descubra a porcentagem de chifre no medidor oficial",
+          "emoji": "🐂"
+        },
+        {
+          "name": "feio",
+          "category": "games",
+          "description": "Descubra a porcentagem de beleza ou espalhafato no feiómetro",
+          "emoji": "🧟"
+        },
+        {
+          "name": "gado",
+          "category": "games",
+          "description": "Mede o quanto a pessoa é emocionada ou gado",
+          "emoji": "🤠"
+        }
+      ]
+    },
+    {
+      "id": "upd_1788101856801",
+      "version": "2.5.0",
+      "date": "30/08/2026",
+      "timestamp": 1788101856915,
+      "items": [
+        {
+          "name": "afk",
+          "category": "utilities",
+          "description": "Define seu status como ausente e avisa quem marcar você no chat",
+          "emoji": "💤"
+        },
+        {
+          "name": "correio-anonimo",
+          "category": "utilities",
+          "description": "Envia uma mensagem secreta e anônima na DM de um membro do servidor",
+          "emoji": "💌"
+        },
+        {
+          "name": "lembrete",
+          "category": "utilities",
+          "description": "Agenda um lembrete com temporizador e marca você quando o tempo acabar",
+          "emoji": "⏰"
+        },
+        {
+          "name": "letra",
+          "category": "utilities",
+          "description": "Pesquisa a letra completa e detalhes de qualquer música",
+          "emoji": "🎵"
+        },
+        {
+          "name": "resumo-chat",
+          "category": "utilities",
+          "description": "Lê as últimas mensagens do canal e gera um resumo inteligente dos assuntos",
+          "emoji": "📋"
+        }
+      ]
+    },
+    {
+      "id": "upd_1788100542207",
+      "version": "2.5.0",
+      "date": "30/08/2026",
+      "timestamp": 1788100542268,
+      "items": [
+        {
+          "name": "relacionamento",
+          "category": "economy",
+          "description": "Defina seu status de relacionamento no perfil (estilo Facebook)",
+          "emoji": "💍"
+        }
+      ]
+    },
+    {
+      "id": "upd_1788099913373",
+      "version": "2.5.0",
+      "date": "30/08/2026",
+      "timestamp": 1788099913452,
+      "items": [
+        {
+          "name": "doar",
+          "category": "economy",
+          "description": "Transfere NatashaCoins para outro membro ou dá moedas se for o Dono",
+          "emoji": "🪙"
+        },
+        {
+          "name": "perfil",
+          "category": "economy",
+          "description": "Exibe o perfil e estatísticas do usuário no servidor",
+          "emoji": "🪙"
+        },
+        {
+          "name": "adverter",
+          "category": "admin",
+          "description": "Gerencia o sistema de advertências do servidor",
+          "emoji": "👑"
+        },
+        {
+          "name": "banir",
+          "category": "admin",
+          "description": "Bane um membro do servidor",
+          "emoji": "👑"
+        },
+        {
+          "name": "mute",
+          "category": "admin",
+          "description": "Aplica timeout / silenciamento temporário a um membro",
+          "emoji": "👑"
+        }
+      ]
+    }
+  ],
+  "lastAnnouncedVersion": "1.0.0",
+  "firstRunCompleted": true
+}
