@@ -1,7 +1,6 @@
 import axios from "axios";
 import { spawn } from "child_process";
 import { GoogleGenAI } from "@google/genai";
-import gTTS from "node-gtts";
 import dotenv from "dotenv";
 import { OWNER_IDS } from "../config.js";
 dotenv.config();
@@ -77,7 +76,7 @@ Diretrizes Obrigatórias:
 - Tom: Espontânea, inteligente, amigável e natural.
 - Respostas Curtas: 1 a 3 frases no máximo, direto ao ponto.
 - AÇÃO DIRETA: Se pedirem piada, história ou explicação, ENTREGUE O CONTEÚDO IMEDIATAMENTE no mesmo turno.
-- Se receber um áudio, transcreva/entenda o que foi dito e responda naturalmente.
+- Se receber um áudio, transcreva/entenda o que foi dito e responda naturally.
 `.trim();
 
   if (aiClient) {
@@ -123,31 +122,53 @@ Diretrizes Obrigatórias:
     : "Tive uma oscilação de conexão rápida. Pode repetir?";
 }
 
-// Geração de Áudio usando gTTS funcional no Node.js
+// Geração de Áudio nativa com Gemini 2.5 Flash Multispeaker via REST API
 export async function generatePodcastAudio(script) {
+  if (!apiKey) return null;
+
   try {
-    const cleanScript = script
-      .replace(/^(alex|sam):\s*/gim, "")
-      .replace(/\n+/g, " ")
-      .trim();
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    if (!cleanScript) return null;
+    const payload = {
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `Leia o seguinte roteiro com duas vozes distintas no formato de podcast:\n\n${script}`
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        responseModalities: ["AUDIO"],
+        speechConfig: {
+          multiSpeakerConfig: {
+            speakers: [
+              { name: "Alex", voiceName: "Puck" },
+              { name: "Sam", voiceName: "Charon" }
+            ]
+          }
+        }
+      }
+    };
 
-    const gtts = gTTS("pt");
-
-    return new Promise((resolve) => {
-      const chunks = [];
-      const stream = gtts.stream(cleanScript);
-
-      stream.on("data", (chunk) => chunks.push(chunk));
-      stream.on("end", () => resolve(Buffer.concat(chunks)));
-      stream.on("error", (err) => {
-        console.error("[ERRO GTTS STREAM]:", err);
-        resolve(null);
-      });
+    const response = await axios.post(url, payload, {
+      headers: { "Content-Type": "application/json" }
     });
+
+    const candidates = response.data?.candidates;
+    if (candidates && candidates[0]?.content?.parts) {
+      for (const part of candidates[0].content.parts) {
+        if (part.inlineData && part.inlineData.data) {
+          return Buffer.from(part.inlineData.data, "base64");
+        }
+      }
+    }
+
+    return null;
   } catch (err) {
-    console.error("[ERRO GERAR PODCAST AUDIO]:", err?.message || err);
+    console.error("[ERRO GEMINI MULTISPEAKER REST]:", err?.response?.data || err?.message || err);
     return null;
   }
 }
