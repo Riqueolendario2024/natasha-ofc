@@ -3,8 +3,7 @@ import { EdgeTTS } from "node-edge-tts";
 export async function textToAudioBuffer(text, voice = "pt-BR-FranciscaNeural") {
   try {
     const tts = new EdgeTTS({ voice, lang: "pt-BR", outputFormat: "audio-24khz-96kbps-mono-mp3" });
-    await tts.synthesize(text);
-    return tts.buffer;
+    return await tts.synthesizeBuffer(text);
   } catch (error) {
     console.error("Erro no textToAudioBuffer:", error);
     return null;
