@@ -1,3 +1,4 @@
+import http from "http";
 import {
   Client,
   GatewayIntentBits,
@@ -29,6 +30,16 @@ import { logErrorToFile, logger } from "./src/utils/logger.js";
 import { runAutoUpdateCheck } from "./src/services/autoUpdateNotifier.js";
 import { isAFK, getAFK, removeAFK, formatTimePassed } from "./src/utils/afkManager.js";
 import { startArcadeServer } from "./src/services/arcadeServer.js";
+
+// Servidor HTTP para satisfazer a checagem de porta da Render (Evita cobrar cartão)
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.write("Natasha Bot Online!");
+  res.end();
+}).listen(PORT, () => {
+  console.log(chalk.green(`[RENDER] Servidor HTTP escutando na porta ${PORT}`));
+});
 
 const startTime = Date.now();
 
