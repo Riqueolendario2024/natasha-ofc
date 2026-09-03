@@ -1,6 +1,7 @@
 import axios from "axios";
 import { spawn } from "child_process";
 import { GoogleGenAI } from "@google/genai";
+import gTTS from "node-gtts";
 import dotenv from "dotenv";
 import { OWNER_IDS } from "../config.js";
 dotenv.config();
@@ -122,39 +123,31 @@ Diretrizes Obrigatórias:
     : "Tive uma oscilação de conexão rápida. Pode repetir?";
 }
 
-// Geração de Áudio com Multi-Speaker TTS nativo do Gemini 2.5
+// Geração de Áudio usando gTTS funcional no Node.js
 export async function generatePodcastAudio(script) {
-  if (!aiClient) return null;
-
   try {
-    const promptFormatado = `Leia o roteiro a seguir como um podcast falado por duas pessoas com vozes diferentes (Alex e Sam):\n\n${script}`;
+    const cleanScript = script
+      .replace(/^(alex|sam):\s*/gim, "")
+      .replace(/\n+/g, " ")
+      .trim();
 
-    const response = await aiClient.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: promptFormatado,
-      config: {
-        responseModalities: ["AUDIO"],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: {
-              voiceName: "Puck"
-            }
-          }
-        }
-      }
+    if (!cleanScript) return null;
+
+    const gtts = gTTS("pt");
+
+    return new Promise((resolve) => {
+      const chunks = [];
+      const stream = gtts.stream(cleanScript);
+
+      stream.on("data", (chunk) => chunks.push(chunk));
+      stream.on("end", () => resolve(Buffer.concat(chunks)));
+      stream.on("error", (err) => {
+        console.error("[ERRO GTTS STREAM]:", err);
+        resolve(null);
+      });
     });
-
-    const candidates = response.candidates;
-    if (candidates && candidates[0]?.content?.parts) {
-      for (const part of candidates[0].content.parts) {
-        if (part.inlineData && part.inlineData.data) {
-          return Buffer.from(part.inlineData.data, "base64");
-        }
-      }
-    }
-    return null;
   } catch (err) {
-    console.error("[ERRO GEMINI MULTI-SPEAKER TTS]:", err?.message || err);
+    console.error("[ERRO GERAR PODCAST AUDIO]:", err?.message || err);
     return null;
   }
 }
