@@ -7,7 +7,7 @@ export async function textToAudioBuffer(text, voice = "pt-BR-FranciscaNeural") {
   const tmpFile = path.join(os.tmpdir(), `tts_${Date.now()}_${Math.random().toString(36).substring(7)}.mp3`);
   try {
     const tts = new EdgeTTS({ voice, lang: "pt-BR", outputFormat: "audio-24khz-96kbps-mono-mp3" });
-    await tts.synthesize(text, tmpFile);
+    await tts.toFile(tmpFile, text);
     
     if (fs.existsSync(tmpFile)) {
       const buffer = fs.readFileSync(tmpFile);
