@@ -67,8 +67,12 @@ export async function askAI({ prompt, userId = "default", attachment = null }) {
   const agoraBrasil = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
   const isOwner = OWNER_IDS.includes(userId);
 
-  const SYSTEM_INSTRUCTION = `
-Você é a Natasha, assistente virtual e gamer brasileira do Discord.
+  // Trata solicitação de podcast de forma isolada para não conflitar com instrução de respostas curtas
+  const isPodcastRequest = prompt.toLowerCase().includes("podcast") || prompt.toLowerCase().includes("roteiro");
+
+  const SYSTEM_INSTRUCTION = isPodcastRequest
+    ? `Você é um gerador de roteiros para podcast em áudio. Escreva um diálogo divertido entre duas pessoas (Alex e Sam) comentando os assuntos solicitados.`
+    : `Você é a Natasha, assistente virtual e gamer brasileira do Discord.
 ${isOwner ? "Seu interlocutor é seu criador e parceiro (Riquefla / Adryan Henrique)." : "Seu interlocutor é um membro da comunidade."}
 Horário de Brasília: ${agoraBrasil}.
 
@@ -76,8 +80,7 @@ Diretrizes Obrigatórias:
 - Tom: Espontânea, inteligente, amigável e natural.
 - Respostas Curtas: 1 a 3 frases no máximo, direto ao ponto.
 - AÇÃO DIRETA: Se pedirem piada, história ou explicação, ENTREGUE O CONTEÚDO IMEDIATAMENTE no mesmo turno.
-- Se receber um áudio, transcreva/entenda o que foi dito e responda naturally.
-`.trim();
+- Se receber um áudio, transcreva/entenda o que foi dito e responda naturalmente.`.trim();
 
   if (aiClient) {
     const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
@@ -85,14 +88,16 @@ Diretrizes Obrigatórias:
     for (const modelName of modelsToTry) {
       try {
         let history = userConversations.get(userId) || [];
-        const promptCompleto = `${SYSTEM_INSTRUCTION}\n\nHistórico:\n${history.slice(-4).join("\n")}\n\nUsuário: ${prompt}\nNatasha:`;
-
         const parts = [];
 
         if (attachment && attachment.url) {
           const mediaPart = await fetchMediaPart(attachment.url, attachment.contentType);
           if (mediaPart) parts.push(mediaPart);
         }
+
+        const promptCompleto = isPodcastRequest 
+          ? `${SYSTEM_INSTRUCTION}\n\nPedido do usuário: ${prompt}`
+          : `${SYSTEM_INSTRUCTION}\n\nHistórico:\n${history.slice(-4).join("\n")}\n\nUsuário: ${prompt}\nNatasha:`;
 
         parts.push({ text: promptCompleto });
 
@@ -104,10 +109,12 @@ Diretrizes Obrigatórias:
         const text = response?.text?.trim();
         if (text) {
           const cleanText = text.replace(/^(Natasha:\s*)/i, "");
-          history.push(`Usuário: ${prompt}`);
-          history.push(`Natasha: ${cleanText}`);
-          if (history.length > 8) history = history.slice(-8);
-          userConversations.set(userId, history);
+          if (!isPodcastRequest) {
+            history.push(`Usuário: ${prompt}`);
+            history.push(`Natasha: ${cleanText}`);
+            if (history.length > 8) history = history.slice(-8);
+            userConversations.set(userId, history);
+          }
           return cleanText;
         }
       } catch (err) {
